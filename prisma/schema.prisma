@@ -13,3 +13,37 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Quotation {
+  id             String            @id @default(cuid())
+  version        Int
+  status         QuotationStatus
+  date           DateTime         @default(now())
+  taxRate        Float
+
+  clientId       String
+  client         Client           @relation(fields: [clientId], references: [id])
+
+  quotationLines Json             // <-- renommé ici
+}
+
+model Client {
+  id            String   @id @default(cuid())
+  firstname     String
+  lastname      String
+  activityName  String
+  address       String
+  phone         String
+  email         String
+  legalStatus   String
+
+  quotations    Quotation[]
+}
+
+enum QuotationStatus {
+  draft
+  sent
+  accepted
+  rejected
+}
+
