@@ -2,11 +2,15 @@ import { createQuotationUseCase } from "../use-cases/create-quotation";
 import { QuotationRepository } from "../../domain/QuotationRepository";
 import { CreateQuotationInput } from "../use-cases/create-quotation";
 import { ClientRepository } from "../../domain/ClientRepository";
+import { MailService } from "@/src/app/mail/application/services/MailService";
+import { CurrentUserService } from "../../domain/services/CurrentUserService";
 
 export class QuotationAppService {
   constructor(
     private repo: QuotationRepository,
-    private clientRepo: ClientRepository
+    private clientRepo: ClientRepository,
+    private mailService: MailService,
+    private currentUserService?: CurrentUserService
   ) {}
 
   async createQuotation(
@@ -21,6 +25,16 @@ export class QuotationAppService {
       ...input,
       client,
     });
+
+    const currentUser = await this.currentUserService?.getCurrentUser();
+
+    await this.mailService.sendQuotationConfirmation(
+      quotation.client.email,
+      quotation.id,
+      `${
+        currentUser?.user?.firstName
+      } ${currentUser?.user?.lastName.toUpperCase()}`
+    );
 
     return quotation;
   }
