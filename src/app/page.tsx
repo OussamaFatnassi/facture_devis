@@ -1,7 +1,12 @@
 // app/page.tsx
-import Link from "next/link";
 
-export default function Home() {
+import Link from "next/link";
+import { getCurrentUser } from "./user-auth/actions/login-actions";
+
+export default async function Home() {
+  const userResponse = await getCurrentUser();
+  const user = userResponse.user;
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navbar simple */}
@@ -20,6 +25,7 @@ export default function Home() {
         <h2 className="text-2xl font-bold text-gray-700">
           Bienvenue sur votre application de gestion de devis
         </h2>
+        {user?.firstName} {user?.id}
       </main>
 
       {/* Footer minimal (optionnel) */}
