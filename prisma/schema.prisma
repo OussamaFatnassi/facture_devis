@@ -74,6 +74,7 @@ enum QuotationStatus {
   rejected
 }
 
+
 enum InvoiceStatus {
   draft
   sent
