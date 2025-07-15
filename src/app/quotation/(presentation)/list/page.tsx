@@ -1,13 +1,49 @@
 import { getAllQuotations } from "../../actions/quotation-actions";
 import Link from "next/link";
 import { QuotationTable } from "../../components/QuotationTable";
+import { Quotation } from "../../domain/Quotation";
+
+// Fonction utilitaire pour convertir les instances de classe en objets simples
+function serializeQuotation(quotation: Quotation) {
+  return {
+    id: quotation.id,
+    version: quotation.version,
+    status: quotation.status,
+    date: quotation.date.toISOString(),
+    taxRate: quotation.taxRate,
+    totalWithoutTaxes: quotation.totalWithoutTaxes,
+    totalWithTaxes: quotation.totalWithTaxes,
+    client: {
+      id: quotation.client.id,
+      firstname: quotation.client.firstname,
+      lastname: quotation.client.lastname,
+      activityName: quotation.client.activityName,
+      address: quotation.client.address,
+      phone: quotation.client.phone,
+      email: quotation.client.email,
+      legalStatus: quotation.client.legalStatus,
+    },
+    lines: quotation.lines.map(line => ({
+      description: line.description,
+      quantity: line.quantity,
+      unitPrice: line.unitPrice,
+      totalPrice: line.totalPrice,
+    })),
+    userId: quotation.userId,
+  };
+}
 
 export default async function QuotationListPage() {
   let quotations: any[] = [];
   let error: string | null = null;
 
   try {
-    quotations = await getAllQuotations();
+    const response = await getAllQuotations();
+    if (response.success && response.data) {
+      quotations = response.data.map((quotation: Quotation) => serializeQuotation(quotation));
+    } else {
+      error = response.message || "Erreur lors de la récupération des devis";
+    }
   } catch (err) {
     error = err instanceof Error ? err.message : "Échec du chargement des devis";
   }

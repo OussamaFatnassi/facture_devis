@@ -1,6 +1,7 @@
 import { PrismaQuotationRepository } from "@/src/app/quotation/infrastructure/repositories/quotation-repository";
 import { PrismaClientRepository } from "../../infrastructure/repositories/client-repository";
 import { GetQuotationById } from "@/src/app/quotation/application/use-cases/get-quotation-by-id";
+import { getCurrentUser } from "../../../user-auth/actions/login-actions";
 
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -12,6 +13,12 @@ type Props = {
 };
 
 export default async function QuotationDetailPage({ params }: Props) {
+  // Verify user authentication
+  const userResponse = await getCurrentUser();
+  if (!userResponse.success || !userResponse.user) {
+    notFound();
+  }
+
   const repo = new PrismaQuotationRepository();
   const clientRepo = new PrismaClientRepository();
   const useCase = new GetQuotationById(repo, clientRepo);
@@ -19,6 +26,11 @@ export default async function QuotationDetailPage({ params }: Props) {
   const quotation = await useCase.execute(params.id);
 
   if (!quotation) {
+    notFound();
+  }
+
+  // Verify that the quotation belongs to the current user
+  if (quotation.userId !== userResponse.user.id) {
     notFound();
   }
 
