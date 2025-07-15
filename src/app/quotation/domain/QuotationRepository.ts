@@ -5,4 +5,5 @@ export interface QuotationRepository {
   findById(id: string): Promise<Quotation | null>;
   findAll(): Promise<Quotation[]>;
   findByUser(userId: string | undefined): Promise<Quotation[] | null>;
+  update(quotation: Quotation): Promise<Quotation>;
 }

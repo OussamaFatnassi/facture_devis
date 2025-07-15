@@ -1,106 +1,60 @@
-import { PrismaQuotationRepository } from "@/src/app/quotation/infrastructure/repositories/quotation-repository";
-// import { GetAllQuotations } from "@/src/app/quotation/application/use-cases/get-all-quotations";
-import { GetQuotationByUser } from "../../application/use-cases/get-quotations-by-user";
-
+import { getAllQuotations } from "../../actions/quotation-actions";
 import Link from "next/link";
-import { QuotationLine } from "../../domain/Quotation";
-import { CurrentUserServiceImpl } from "@/src/app/user-auth/infrastructure/services/current-user-service";
+import { QuotationTable } from "../../components/QuotationTable";
 
 export default async function QuotationListPage() {
-  const repo = new PrismaQuotationRepository();
-  const userService = new CurrentUserServiceImpl();
-  const useCase = new GetQuotationByUser(repo);
-  const userResponse = await userService.getCurrentUser();
-  const quotations = await useCase.execute(userResponse.user?.id);
+  let quotations: any[] = [];
+  let error: string | null = null;
+
+  try {
+    quotations = await getAllQuotations();
+  } catch (err) {
+    error = err instanceof Error ? err.message : "Échec du chargement des devis";
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Liste des devis */}
-      <main className="flex-1 p-6 max-w-5xl mx-auto w-full">
-        <h1 className="text-2xl font-bold mb-6">Liste des devis</h1>
+      {/* Main Content */}
+      <main className="flex-1 p-6 max-w-7xl mx-auto w-full">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">Liste des devis</h1>
+          <Link
+            href="/quotation"
+            className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition flex items-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Créer un devis
+          </Link>
+        </div>
 
-        <table className="w-full border text-sm text-left">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="p-2 border">#</th>
-              <th className="p-2 border">Client</th>
-              <th className="p-2 border">Date</th>
-              <th className="p-2 border">Statut</th>
-              <th className="p-2 border">Total HT</th>
-              <th className="p-2 border">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {quotations.map((q, i) => (
-              <tr key={q.id} className="hover:bg-gray-50">
-                <td className="p-2 border">{i + 1}</td>
-                <td className="p-2 border">
-                  <Link
-                    href={`/quotation/${q.id}`}
-                    className="text-blue-600 hover:underline"
-                  >
-                    {q.client.firstname} {q.client.lastname}
-                  </Link>
-                </td>
-                <td className="p-2 border">
-                  {new Date(q.date).toLocaleDateString()}
-                </td>
-                <td className="p-2 border">{q.status}</td>
-                <td className="p-2 border">
-                  {Array.isArray(q.lines)
-                    ? q.lines
-                        .reduce(
-                          (sum: number, line: QuotationLine) =>
-                            sum + line.totalPrice,
-                          0
-                        )
-                        .toFixed(2) + " €"
-                    : "N/A"}
-                </td>
-                <td className="p-2 border">
-                  {" "}
-                  {/* Ajout du bouton PDF */}
-                  <div className="mt-2">
-                    <Link
-                      href={`/api/quotations/${q.id}/download`}
-                      target="_blank"
-                      className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 transition font-medium text-xs gap-2"
-                      title="Télécharger ce devis en PDF"
-                    >
-                      {/* Icône de téléchargement (SVG inline, accessible) */}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4"
-                        />
-                      </svg>
-                      <span className="sr-only sm:not-sr-only">PDF</span>
-                    </Link>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {error}
+          </div>
+        )}
+
+        {quotations.length === 0 ? (
+          <div className="text-center py-12">
+            <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <p className="text-gray-500 text-lg mb-4">Aucun devis trouvé</p>
+            <Link
+              href="/quotation"
+              className="bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition inline-flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Créer votre premier devis
+            </Link>
+          </div>
+        ) : (
+          <QuotationTable initialQuotations={quotations} />
+        )}
       </main>
-
-      <Link
-        href="/quotation"
-        className="fixed bottom-6 right-6 bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 hover:bg-blue-700 transition"
-      >
-        <span className="text-lg">+</span>
-        <span className="hidden sm:inline text-sm font-medium">
-          Nouveau devis
-        </span>
-      </Link>
     </div>
   );
 }
