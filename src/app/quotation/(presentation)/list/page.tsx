@@ -1,13 +1,17 @@
 import { PrismaQuotationRepository } from "@/src/app/quotation/infrastructure/repositories/quotation-repository";
-import { GetAllQuotations } from "@/src/app/quotation/application/use-cases/get-all-quotations";
+// import { GetAllQuotations } from "@/src/app/quotation/application/use-cases/get-all-quotations";
+import { GetQuotationByUser } from "../../application/use-cases/get-quotations-by-user";
 
 import Link from "next/link";
 import { QuotationLine } from "../../domain/Quotation";
+import { CurrentUserServiceImpl } from "@/src/app/user-auth/infrastructure/services/current-user-service";
 
 export default async function QuotationListPage() {
   const repo = new PrismaQuotationRepository();
-  const useCase = new GetAllQuotations(repo);
-  const quotations = await useCase.execute();
+  const userService = new CurrentUserServiceImpl();
+  const useCase = new GetQuotationByUser(repo);
+  const userResponse = await userService.getCurrentUser();
+  const quotations = await useCase.execute(userResponse.user?.id);
 
   return (
     <div className="min-h-screen flex flex-col">
