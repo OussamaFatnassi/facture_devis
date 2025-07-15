@@ -1,6 +1,10 @@
+// app/layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+
+import { Theme } from "@radix-ui/themes";
+import "@radix-ui/themes/styles.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +31,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <Theme appearance="light" accentColor="blue" radius="medium">
+          {children}
+        </Theme>
+        {/* Footer */}
+        <footer className="bg-gray-100 text-center py-4 text-sm text-gray-500">
+          © {new Date().getFullYear()} - Application Facture & Devis
+        </footer>
       </body>
     </html>
   );
