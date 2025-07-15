@@ -24,6 +24,8 @@ model Quotation {
   clientId       String
   client         Client           @relation(fields: [clientId], references: [id])
 
+  userId String
+
   quotationLines Json             // <-- renommé ici
   
   invoice        Invoice?         // Relation 1:1 avec Invoice
@@ -80,3 +82,22 @@ enum InvoiceStatus {
   cancelled
 }
 
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  role      UserRole @default(USER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+  MANAGER
+}
