@@ -15,19 +15,6 @@ export default async function QuotationListPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navbar */}
-      <nav className="bg-gray-900 text-white px-6 py-4 shadow-md flex items-center justify-between">
-        <Link href="/" className="text-lg font-semibold">
-          Facture & Devis
-        </Link>
-        <Link
-          href="/quotation/list"
-          className="text-sm bg-white text-gray-900 px-4 py-2 rounded hover:bg-gray-100 transition"
-        >
-          Devis
-        </Link>
-      </nav>
-
       {/* Liste des devis */}
       <main className="flex-1 p-6 max-w-5xl mx-auto w-full">
         <h1 className="text-2xl font-bold mb-6">Liste des devis</h1>
@@ -40,6 +27,7 @@ export default async function QuotationListPage() {
               <th className="p-2 border">Date</th>
               <th className="p-2 border">Statut</th>
               <th className="p-2 border">Total HT</th>
+              <th className="p-2 border">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -68,15 +56,33 @@ export default async function QuotationListPage() {
                         )
                         .toFixed(2) + " €"
                     : "N/A"}
-
+                </td>
+                <td className="p-2 border">
+                  {" "}
                   {/* Ajout du bouton PDF */}
                   <div className="mt-2">
                     <Link
                       href={`/api/quotations/${q.id}/download`}
                       target="_blank"
-                      className="text-blue-600 hover:underline text-xs"
+                      className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 transition font-medium text-xs gap-2"
+                      title="Télécharger ce devis en PDF"
                     >
-                      Télécharger PDF
+                      {/* Icône de téléchargement (SVG inline, accessible) */}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4"
+                        />
+                      </svg>
+                      <span className="sr-only sm:not-sr-only">PDF</span>
                     </Link>
                   </div>
                 </td>
