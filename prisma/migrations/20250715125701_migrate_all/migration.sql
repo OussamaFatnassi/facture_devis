@@ -4,6 +4,9 @@ CREATE TYPE "QuotationStatus" AS ENUM ('draft', 'sent', 'accepted', 'rejected');
 -- CreateEnum
 CREATE TYPE "InvoiceStatus" AS ENUM ('draft', 'sent', 'paid', 'overdue', 'cancelled');
 
+-- CreateEnum
+CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'USER', 'MANAGER');
+
 -- CreateTable
 CREATE TABLE "Quotation" (
     "id" TEXT NOT NULL,
@@ -12,6 +15,7 @@ CREATE TABLE "Quotation" (
     "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "taxRate" DOUBLE PRECISION NOT NULL,
     "clientId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
     "quotationLines" JSONB NOT NULL,
 
     CONSTRAINT "Quotation_pkey" PRIMARY KEY ("id")
@@ -41,8 +45,8 @@ CREATE TABLE "Invoice" (
     "paidDate" TIMESTAMP(3),
     "quotationId" TEXT NOT NULL,
     "clientId" TEXT NOT NULL,
-    "totalHT" DOUBLE PRECISION NOT NULL,
-    "totalTTC" DOUBLE PRECISION NOT NULL,
+    "totalExcludingTax" DOUBLE PRECISION NOT NULL,
+    "totalIncludingTax" DOUBLE PRECISION NOT NULL,
     "taxRate" DOUBLE PRECISION NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -50,11 +54,29 @@ CREATE TABLE "Invoice" (
     CONSTRAINT "Invoice_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "users" (
+    "id" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "firstName" TEXT NOT NULL,
+    "lastName" TEXT NOT NULL,
+    "role" "UserRole" NOT NULL DEFAULT 'USER',
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Invoice_invoiceNumber_key" ON "Invoice"("invoiceNumber");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Invoice_quotationId_key" ON "Invoice"("quotationId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- AddForeignKey
 ALTER TABLE "Quotation" ADD CONSTRAINT "Quotation_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "Client"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

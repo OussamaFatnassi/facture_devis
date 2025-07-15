@@ -1,6 +1,6 @@
-import { getAcceptedQuotations } from '../actions/invoice-actions';
-import Link from 'next/link';
-import { InvoiceTable } from '../components/InvoiceTable';
+import { getAcceptedQuotations } from "../actions/invoice-actions";
+import Link from "next/link";
+import { InvoiceTable } from "../components/InvoiceTable";
 
 export default async function InvoicePage() {
   let quotations: any[] = [];
@@ -9,36 +9,15 @@ export default async function InvoicePage() {
   try {
     quotations = await getAcceptedQuotations();
   } catch (err) {
-    error = err instanceof Error ? err.message : 'Failed to load quotations';
+    error = err instanceof Error ? err.message : "Failed to load quotations";
   }
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navbar */}
-      <nav className="bg-gray-900 text-white px-6 py-4 shadow-md flex items-center justify-between">
-        <Link href="/" className="text-lg font-semibold">
-          Invoice & Quote
-        </Link>
-        <div className="flex gap-4">
-          <Link
-            href="/quotation/list"
-            className="text-sm bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600 transition"
-          >
-            Quotes
-          </Link>
-          <Link
-            href="/invoice"
-            className="text-sm bg-white text-gray-900 px-4 py-2 rounded hover:bg-gray-100 transition"
-          >
-            Invoices
-          </Link>
-        </div>
-      </nav>
-
       {/* Main Content */}
       <main className="flex-1 p-6 max-w-7xl mx-auto w-full">
         <h1 className="text-2xl font-bold mb-6">Invoice Management</h1>
-        
+
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
             {error}
