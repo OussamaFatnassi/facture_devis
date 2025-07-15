@@ -1,6 +1,7 @@
 import { PrismaClient } from "../../../../../generated/prisma";
 import { QuotationRepository } from "../../../quotation/domain/QuotationRepository";
 import { Quotation, QuotationLine } from "../../../quotation/domain/Quotation";
+// import { toDomain, toPersistence } from "../mappers/quotation-mapper";
 
 const prisma = new PrismaClient();
 
@@ -13,6 +14,7 @@ export class PrismaQuotationRepository implements QuotationRepository {
         status: quotation.status,
         date: quotation.date,
         taxRate: quotation.taxRate,
+        userId: quotation.userId,
         client: {
           connect: { id: quotation.client.id },
         },
@@ -49,7 +51,8 @@ export class PrismaQuotationRepository implements QuotationRepository {
         legalStatus: record.client.legalStatus,
       },
       record.date,
-      record.taxRate
+      record.taxRate,
+      record.userId
     );
   }
 
@@ -78,7 +81,40 @@ export class PrismaQuotationRepository implements QuotationRepository {
           legalStatus: record.client.legalStatus,
         },
         record.date,
-        record.taxRate
+        record.taxRate,
+        record.userId
+      );
+    });
+  }
+
+  async findByUser(userId: string): Promise<Quotation[] | null> {
+    const records = await prisma.quotation.findMany({
+      where: { userId },
+      include: { client: true },
+      orderBy: { date: "desc" },
+    });
+
+    return records.map((record) => {
+      const lines = record.quotationLines as unknown as QuotationLine[];
+
+      return new Quotation(
+        record.id,
+        record.version,
+        lines,
+        record.status,
+        {
+          id: record.client.id,
+          firstname: record.client.firstname,
+          lastname: record.client.lastname,
+          activityName: record.client.activityName,
+          address: record.client.address,
+          phone: record.client.phone,
+          email: record.client.email,
+          legalStatus: record.client.legalStatus,
+        },
+        record.date,
+        record.taxRate,
+        record.userId
       );
     });
   }

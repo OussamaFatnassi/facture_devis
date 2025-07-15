@@ -20,6 +20,7 @@ export type CreateQuotationInput = {
     legalStatus: string;
   };
   taxRate: number;
+  userId: string | undefined;
 };
 
 export async function createQuotationUseCase(
@@ -38,7 +39,8 @@ export async function createQuotationUseCase(
     "draft",
     input.client,
     new Date(),
-    input.taxRate
+    input.taxRate,
+    input.userId
   );
 
   if (!quotation.isValid()) {
