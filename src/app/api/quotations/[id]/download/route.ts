@@ -3,12 +3,17 @@ import { PrismaQuotationRepository } from "@/src/app/quotation/infrastructure/re
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import fs from "fs";
 import path from "path";
+import { getCurrentUser } from "@/src/app/user-auth/actions/login-actions";
 
 export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const { id } = await params;
+
+  const userResponse = await getCurrentUser();
+  const user = userResponse.user;
+  const userFullName = user?.fullName;
 
   const repo = new PrismaQuotationRepository();
   const quotation = await repo.findById(id);
@@ -48,7 +53,8 @@ export async function GET(
   // Header
   drawText("DEVIS", 26, margin, rgb(0.2, 0.2, 0.6), boldFont);
   y -= 10;
-  drawText(`ID: ${quotation.id}`, 10);
+  // drawText(`ID: ${quotation.id}`, 10);
+  drawText(`Émis par : ${userFullName}`, 10, margin, rgb(0, 0, 0), boldFont);
   drawText(`Date: ${quotation.date.toLocaleDateString()}`, 10);
   y -= 10;
 
@@ -63,7 +69,7 @@ export async function GET(
   y -= 20;
 
   // Table Header
-  const tableStartY = y;
+  // const tableStartY = y;
   const colX = {
     desc: margin + 2,
     qty: margin + 280,
@@ -157,6 +163,7 @@ export async function GET(
   const pdfBytes = await pdfDoc.save();
 
   return new Response(Buffer.from(pdfBytes), {
+    status: 201,
     headers: {
       "Content-Type": "application/pdf",
       "Content-Disposition": `attachment; filename=quotation-${quotation.id}.pdf`,
