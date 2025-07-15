@@ -26,7 +26,8 @@ export class Quotation {
     public status: QuotationStatus,
     public client: ClientInfo,
     public date: Date,
-    public taxRate: number
+    public taxRate: number,
+    public userId: string
   ) {}
 
   get totalWithoutTaxes(): number {

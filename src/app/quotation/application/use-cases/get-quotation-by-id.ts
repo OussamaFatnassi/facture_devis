@@ -22,7 +22,8 @@ export class GetQuotationById {
       quotation.status,
       client,
       quotation.date,
-      quotation.taxRate
+      quotation.taxRate,
+      quotation.userId
     );
   }
 }
