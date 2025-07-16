@@ -1,5 +1,12 @@
-import { ValidateTokenResponse } from "@/src/app/user-auth/application/use-cases/login-user";
+export interface CurrentUserFromQuotationDomain {
+  user: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+  };
+}
 
 export interface CurrentUserService {
-  getCurrentUser(): Promise<ValidateTokenResponse>;
+  getCurrentUser(): Promise<CurrentUserFromQuotationDomain>;
 }

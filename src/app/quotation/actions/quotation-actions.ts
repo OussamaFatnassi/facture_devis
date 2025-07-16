@@ -5,10 +5,11 @@ import { PrismaClientRepository } from "../infrastructure/repositories/client-re
 import { QuotationAppService } from "../application/services/quotation-service";
 import { NodemailerMailer } from "../../mail/infrastructure/nodemailer-mailer";
 import { MailService } from "../../mail/application/services/MailService";
-import { CurrentUserServiceImpl } from "../../user-auth/infrastructure/services/current-user-service";
+import { CurrentUserServiceImpl } from "@/src/app/quotation/infrastructure/services/current-user-service-implem";
 import { getCurrentUser } from "../../user-auth/actions/login-actions";
 import { CreateClientRequest } from "../domain/ClientRepository";
 import { Quotation } from "../domain/Quotation";
+import { QuotationStatus } from "@/generated/prisma";
 
 export async function createQuotation(formData: FormData) {
   try {
@@ -124,7 +125,7 @@ export async function updateQuotationStatus(formData: FormData) {
       quotation.id,
       quotation.version,
       quotation.lines,
-      status as any,
+      status as QuotationStatus,
       quotation.client,
       quotation.date,
       quotation.taxRate,
