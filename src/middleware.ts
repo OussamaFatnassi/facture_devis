@@ -9,6 +9,7 @@ export function middleware(request: NextRequest) {
 
   // Public routes that don't require authentication
   const publicRoutes = [
+    "/",
     "/user-auth",
     "/user-auth/login",
     "/user-auth/signup",
@@ -17,9 +18,13 @@ export function middleware(request: NextRequest) {
   ];
 
   // Check if the current path is a public route
-  const isPublicRoute = publicRoutes.some((route) =>
-    pathname.startsWith(route)
-  );
+  const isPublicRoute = publicRoutes.some((route) => {
+    // Special handling for root path
+    if (route === "/") {
+      return pathname === "/";
+    }
+    return pathname.startsWith(route);
+  });
 
   // If it's a public route, allow access
   if (isPublicRoute) {
