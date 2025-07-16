@@ -1,4 +1,4 @@
-export interface CurrentUserFromQuotationDomain {
+export interface CurrentUser {
   user: {
     id: string;
     email: string;
@@ -8,5 +8,5 @@ export interface CurrentUserFromQuotationDomain {
 }
 
 export interface CurrentUserService {
-  getCurrentUser(): Promise<CurrentUserFromQuotationDomain>;
+  getCurrentUser(): Promise<CurrentUser>;
 }
