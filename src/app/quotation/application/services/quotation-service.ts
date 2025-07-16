@@ -31,6 +31,7 @@ export class QuotationAppService {
     await this.mailService.sendQuotationConfirmation(
       quotation.client.email,
       quotation.id,
+      quotation.client.firstname,
       `${
         currentUser?.user?.firstName
       } ${currentUser?.user?.lastName.toUpperCase()}`
