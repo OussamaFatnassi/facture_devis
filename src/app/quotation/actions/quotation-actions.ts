@@ -1,6 +1,5 @@
 "use server";
 
-import { createQuotationUseCase } from "../application/use-cases/create-quotation";
 import { PrismaQuotationRepository } from "../infrastructure/repositories/quotation-repository";
 import { PrismaClientRepository } from "../infrastructure/repositories/client-repository";
 import { QuotationAppService } from "../application/services/quotation-service";
@@ -17,7 +16,12 @@ export async function createQuotation(formData: FormData) {
     const clientRepository = new PrismaClientRepository();
     const mailer = new NodemailerMailer();
     const currentUserService = new CurrentUserServiceImpl();
-    const quotationService = new QuotationAppService(quotationRepository, clientRepository, new MailService(mailer), currentUserService);
+    const quotationService = new QuotationAppService(
+      quotationRepository,
+      clientRepository,
+      new MailService(mailer),
+      currentUserService
+    );
 
     // Get current user
     const userResponse = await getCurrentUser();
@@ -41,7 +45,10 @@ export async function createQuotation(formData: FormData) {
         legalStatus: formData.get("legalStatus") as string,
       };
 
-      const newClientResult = await clientRepository.create(clientData, userResponse.user.id);
+      const newClientResult = await clientRepository.create(
+        clientData,
+        userResponse.user.id
+      );
       clientId = newClientResult.id;
     }
 
@@ -77,12 +84,17 @@ export async function getAllQuotations() {
     }
 
     const quotationRepository = new PrismaQuotationRepository();
-    const quotations = await quotationRepository.findByUser(userResponse.user.id);
-    
+    const quotations = await quotationRepository.findByUser(
+      userResponse.user.id
+    );
+
     return { success: true, data: quotations || [] };
   } catch (error) {
     console.error("Error fetching quotations:", error);
-    return { success: false, message: "Erreur lors de la récupération des devis" };
+    return {
+      success: false,
+      message: "Erreur lors de la récupération des devis",
+    };
   }
 }
 
@@ -95,9 +107,9 @@ export async function updateQuotationStatus(formData: FormData) {
     }
 
     const quotationRepository = new PrismaQuotationRepository();
-    const quotationId = formData.get('quotationId') as string;
-    const status = formData.get('status') as string;
-    
+    const quotationId = formData.get("quotationId") as string;
+    const status = formData.get("status") as string;
+
     const quotation = await quotationRepository.findById(quotationId);
     if (!quotation) {
       throw new Error("Quotation not found");
@@ -123,7 +135,10 @@ export async function updateQuotationStatus(formData: FormData) {
     return { success: true, message: "Statut du devis mis à jour" };
   } catch (error) {
     console.error("Error updating quotation status:", error);
-    return { success: false, message: "Erreur lors de la mise à jour du statut" };
+    return {
+      success: false,
+      message: "Erreur lors de la mise à jour du statut",
+    };
   }
 }
 
@@ -140,7 +155,10 @@ export async function getAllClients() {
     return { success: true, data: clients };
   } catch (error) {
     console.error("Error fetching clients:", error);
-    return { success: false, message: "Erreur lors de la récupération des clients" };
+    return {
+      success: false,
+      message: "Erreur lors de la récupération des clients",
+    };
   }
 }
 
@@ -153,7 +171,7 @@ export async function createClient(formData: FormData) {
     }
 
     const clientRepository = new PrismaClientRepository();
-    
+
     const clientData: CreateClientRequest = {
       firstname: formData.get("firstname") as string,
       lastname: formData.get("lastname") as string,
@@ -164,7 +182,10 @@ export async function createClient(formData: FormData) {
       legalStatus: formData.get("legalStatus") as string,
     };
 
-    const newClient = await clientRepository.create(clientData, userResponse.user.id);
+    const newClient = await clientRepository.create(
+      clientData,
+      userResponse.user.id
+    );
     return { success: true, data: newClient };
   } catch (error) {
     console.error("Error creating client:", error);

@@ -1,8 +1,11 @@
-// src/app/quotation/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
-import { createQuotation, getAllClients, createClient } from "../actions/quotation-actions";
+import {
+  createQuotation,
+  getAllClients,
+  createClient,
+} from "../actions/quotation-actions";
 import { TextField } from "@radix-ui/themes";
 import Link from "next/link";
 import { ClientInfo } from "../domain/Quotation";
@@ -57,18 +60,26 @@ export default function QuotationPage() {
 
   const updateLine = (index: number, field: string, value: unknown) => {
     const newLines = [...lines];
-    
+
     // Handle numeric fields to prevent NaN
-    if (field === 'quantity') {
-      const numValue = typeof value === 'string' ? parseInt(value) : value as number;
-      newLines[index] = { ...newLines[index], [field]: isNaN(numValue) ? 1 : numValue };
-    } else if (field === 'unitPrice') {
-      const numValue = typeof value === 'string' ? parseFloat(value) : value as number;
-      newLines[index] = { ...newLines[index], [field]: isNaN(numValue) ? 0 : numValue };
+    if (field === "quantity") {
+      const numValue =
+        typeof value === "string" ? parseInt(value) : (value as number);
+      newLines[index] = {
+        ...newLines[index],
+        [field]: isNaN(numValue) ? 1 : numValue,
+      };
+    } else if (field === "unitPrice") {
+      const numValue =
+        typeof value === "string" ? parseFloat(value) : (value as number);
+      newLines[index] = {
+        ...newLines[index],
+        [field]: isNaN(numValue) ? 0 : numValue,
+      };
     } else {
       newLines[index] = { ...newLines[index], [field]: value };
     }
-    
+
     setLines(newLines);
   };
 
@@ -79,19 +90,22 @@ export default function QuotationPage() {
   };
 
   const calculateTotalHT = () => {
-    return lines.reduce((sum, line) => sum + calculateLineTotal(line.quantity, line.unitPrice), 0);
+    return lines.reduce(
+      (sum, line) => sum + calculateLineTotal(line.quantity, line.unitPrice),
+      0
+    );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!selectedClientId && !showNewClientForm) {
       alert("Veuillez sélectionner un client ou créer un nouveau client");
       return;
     }
 
     const formData = new FormData(e.target as HTMLFormElement);
-    
+
     // Add client selection info
     if (selectedClientId) {
       formData.append("clientId", selectedClientId);
@@ -125,21 +139,46 @@ export default function QuotationPage() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-blue-100 rounded-lg">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <svg
+                  className="w-6 h-6 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
                 </svg>
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Créer un nouveau devis</h1>
-                <p className="text-gray-600 mt-1">Remplissez les informations ci-dessous pour générer votre devis</p>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  Créer un nouveau devis
+                </h1>
+                <p className="text-gray-600 mt-1">
+                  Remplissez les informations ci-dessous pour générer votre
+                  devis
+                </p>
               </div>
             </div>
             <Link
               href="/quotation/list"
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
               Retour à la liste
             </Link>
@@ -153,13 +192,27 @@ export default function QuotationPage() {
             <div className="space-y-6">
               <div className="flex items-center gap-3 pb-4 border-b border-gray-200">
                 <div className="p-2 bg-green-100 rounded-lg">
-                  <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  <svg
+                    className="w-5 h-5 text-green-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900">Informations client</h3>
-                  <p className="text-sm text-gray-600">Sélectionnez un client existant ou créez un nouveau client</p>
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    Informations client
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Sélectionnez un client existant ou créez un nouveau client
+                  </p>
                 </div>
               </div>
 
@@ -182,7 +235,8 @@ export default function QuotationPage() {
                     <option value="">Sélectionner un client</option>
                     {clients.map((client) => (
                       <option key={client.id} value={client.id}>
-                        {client.firstname} {client.lastname} - {client.activityName}
+                        {client.firstname} {client.lastname} -{" "}
+                        {client.activityName}
                       </option>
                     ))}
                   </select>
@@ -199,8 +253,18 @@ export default function QuotationPage() {
                     }}
                     className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                      />
                     </svg>
                     {showNewClientForm ? "Annuler" : "Nouveau client"}
                   </button>
@@ -210,7 +274,9 @@ export default function QuotationPage() {
               {/* New Client Form */}
               {showNewClientForm && (
                 <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                  <h4 className="text-lg font-semibold text-gray-900 mb-4">Créer un nouveau client</h4>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-4">
+                    Créer un nouveau client
+                  </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -263,7 +329,9 @@ export default function QuotationPage() {
                         <option value="SA">SA</option>
                         <option value="EURL">EURL</option>
                         <option value="SNC">SNC</option>
-                        <option value="Auto-entrepreneur">Auto-entrepreneur</option>
+                        <option value="Auto-entrepreneur">
+                          Auto-entrepreneur
+                        </option>
                         <option value="Particulier">Particulier</option>
                       </select>
                     </div>
@@ -330,13 +398,27 @@ export default function QuotationPage() {
             <div className="space-y-6">
               <div className="flex items-center gap-3 pb-4 border-b border-gray-200">
                 <div className="p-2 bg-purple-100 rounded-lg">
-                  <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                  <svg
+                    className="w-5 h-5 text-purple-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+                    />
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900">Lignes du devis</h3>
-                  <p className="text-sm text-gray-600">Ajoutez les produits ou services de votre devis</p>
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    Lignes du devis
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Ajoutez les produits ou services de votre devis
+                  </p>
                 </div>
               </div>
 
@@ -357,8 +439,18 @@ export default function QuotationPage() {
                           onClick={() => removeLine(idx)}
                           className="text-red-600 hover:text-red-800 transition-colors"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
                           </svg>
                         </button>
                       )}
@@ -422,21 +514,35 @@ export default function QuotationPage() {
                         </label>
                         <div className="flex items-center justify-center h-10 bg-white border border-gray-300 rounded-lg">
                           <span className="text-sm font-semibold text-gray-900">
-                            {calculateLineTotal(line.quantity, line.unitPrice).toFixed(2)} €
+                            {calculateLineTotal(
+                              line.quantity,
+                              line.unitPrice
+                            ).toFixed(2)}{" "}
+                            €
                           </span>
                         </div>
                       </div>
                     </div>
                   </div>
                 ))}
-                
+
                 <button
                   type="button"
                   onClick={addLine}
                   className="w-full flex items-center justify-center gap-2 py-3 px-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:text-blue-600 hover:border-blue-300 transition-colors"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                    />
                   </svg>
                   Ajouter une ligne
                 </button>
@@ -447,15 +553,23 @@ export default function QuotationPage() {
             <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-900">Récapitulatif</h4>
+                  <h4 className="text-lg font-semibold text-gray-900">
+                    Récapitulatif
+                  </h4>
                   <p className="text-sm text-gray-600">Total de votre devis</p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm text-gray-600">
-                    Total HT: <span className="font-semibold">{calculateTotalHT().toFixed(2)} €</span>
+                    Total HT:{" "}
+                    <span className="font-semibold">
+                      {calculateTotalHT().toFixed(2)} €
+                    </span>
                   </p>
                   <p className="text-xl font-bold text-gray-900">
-                    Total TTC: <span className="text-blue-600">{(calculateTotalHT() * 1.2).toFixed(2)} €</span>
+                    Total TTC:{" "}
+                    <span className="text-blue-600">
+                      {(calculateTotalHT() * 1.2).toFixed(2)} €
+                    </span>
                   </p>
                 </div>
               </div>
@@ -467,8 +581,18 @@ export default function QuotationPage() {
                 href="/quotation/list"
                 className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
                 Annuler
               </Link>
@@ -476,8 +600,18 @@ export default function QuotationPage() {
                 type="submit"
                 className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
                 </svg>
                 Créer le devis
               </button>
