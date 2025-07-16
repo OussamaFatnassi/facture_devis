@@ -1,10 +1,15 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { updateInvoiceStatus, createInvoiceAsDraft } from '../actions/invoice-actions';
-import { InvoiceStatus } from '../domain/Invoice';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from "react";
+import {
+  updateInvoiceStatus,
+  createInvoiceAsDraft,
+} from "../actions/invoice-actions";
+import { InvoiceStatus } from "../domain/Invoice";
+import { useRouter } from "next/navigation";
+
+import { useTransition } from "react";
+import { sendInvoiceMail } from "@/src/app/invoice/actions/send-invoice-by-email";
 
 interface QuotationData {
   quotation: {
@@ -49,7 +54,8 @@ interface InvoiceTableProps {
 }
 
 export function InvoiceTable({ initialQuotations }: InvoiceTableProps) {
-  const [quotations, setQuotations] = useState<QuotationData[]>(initialQuotations);
+  const [quotations, setQuotations] =
+    useState<QuotationData[]>(initialQuotations);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<Set<string>>(new Set());
   const router = useRouter();
@@ -59,21 +65,23 @@ export function InvoiceTable({ initialQuotations }: InvoiceTableProps) {
     const createMissingInvoices = async () => {
       for (const item of quotations) {
         if (!item.hasInvoice && !loading.has(item.quotation.id)) {
-          setLoading(prev => new Set(prev).add(item.quotation.id));
-          
+          setLoading((prev) => new Set(prev).add(item.quotation.id));
+
           try {
             const result = await createInvoiceAsDraft(item.quotation.id);
             if (result.success && result.invoiceId) {
-              setQuotations(prev => prev.map(q => 
-                q.quotation.id === item.quotation.id 
-                  ? { ...q, hasInvoice: true, invoiceId: result.invoiceId }
-                  : q
-              ));
+              setQuotations((prev) =>
+                prev.map((q) =>
+                  q.quotation.id === item.quotation.id
+                    ? { ...q, hasInvoice: true, invoiceId: result.invoiceId }
+                    : q
+                )
+              );
             }
           } catch (err) {
-            console.error('Error creating invoice:', err);
+            console.error("Error creating invoice:", err);
           } finally {
-            setLoading(prev => {
+            setLoading((prev) => {
               const newSet = new Set(prev);
               newSet.delete(item.quotation.id);
               return newSet;
@@ -86,19 +94,24 @@ export function InvoiceTable({ initialQuotations }: InvoiceTableProps) {
     createMissingInvoices();
   }, [quotations, loading]);
 
-  const handleStatusChange = async (invoiceId: string, newStatus: InvoiceStatus) => {
+  const handleStatusChange = async (
+    invoiceId: string,
+    newStatus: InvoiceStatus
+  ) => {
     try {
-      setLoading(prev => new Set(prev).add(invoiceId));
+      setLoading((prev) => new Set(prev).add(invoiceId));
       const formData = new FormData();
-      formData.append('invoiceId', invoiceId);
-      formData.append('status', newStatus);
-      
+      formData.append("invoiceId", invoiceId);
+      formData.append("status", newStatus);
+
       await updateInvoiceStatus(formData);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update invoice status');
+      setError(
+        err instanceof Error ? err.message : "Failed to update invoice status"
+      );
     } finally {
-      setLoading(prev => {
+      setLoading((prev) => {
         const newSet = new Set(prev);
         newSet.delete(invoiceId);
         return newSet;
@@ -106,12 +119,43 @@ export function InvoiceTable({ initialQuotations }: InvoiceTableProps) {
     }
   };
 
+  const [isPending, startTransition] = useTransition();
+
+  const handleSendMail = (invoiceId: string) => {
+    startTransition(async () => {
+      const response = await sendInvoiceMail(invoiceId);
+      if (response.message === "Email sent.") {
+        updateInvoiceStatusInState(invoiceId, "sent");
+      }
+    });
+  };
+
+  const updateInvoiceStatusInState = (
+    invoiceId: string,
+    newStatus: InvoiceStatus
+  ) => {
+    setQuotations((prev) =>
+      prev.map((q) => {
+        if (q.invoiceId === invoiceId && q.invoice) {
+          return {
+            ...q,
+            invoice: {
+              ...q.invoice,
+              status: newStatus,
+            },
+          };
+        }
+        return q;
+      })
+    );
+  };
+
   return (
     <>
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}
-          <button 
+          <button
             onClick={() => setError(null)}
             className="float-right text-red-500 hover:text-red-700"
           >
@@ -119,13 +163,13 @@ export function InvoiceTable({ initialQuotations }: InvoiceTableProps) {
           </button>
         </div>
       )}
-      
+
       <div className="bg-white shadow rounded-lg overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Quote
+                Devis
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Client
@@ -134,10 +178,10 @@ export function InvoiceTable({ initialQuotations }: InvoiceTableProps) {
                 Date
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Total Inc. VAT
+                Total TTC
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Invoice Status
+                Statut
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
@@ -154,17 +198,18 @@ export function InvoiceTable({ initialQuotations }: InvoiceTableProps) {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
-                    {item.quotation.client.firstname} {item.quotation.client.lastname}
+                    {item.quotation.client.firstname}{" "}
+                    {item.quotation.client.lastname}
                   </div>
                   <div className="text-sm text-gray-500">
                     {item.quotation.client.activityName}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {new Date(item.quotation.date).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit'
+                  {new Date(item.quotation.date).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
                   })}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -172,15 +217,18 @@ export function InvoiceTable({ initialQuotations }: InvoiceTableProps) {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   {item.hasInvoice ? (
-                    <InvoiceStatusSelector 
-                      invoiceId={item.invoiceId!} 
-                      currentStatus={item.invoice?.status || 'draft'}
+                    <InvoiceStatusSelector
+                      invoiceId={item.invoiceId!}
+                      currentStatus={item.invoice?.status || "draft"}
                       onStatusChange={handleStatusChange}
-                      disabled={loading.has(item.invoiceId!) || loading.has(item.quotation.id)}
+                      disabled={
+                        loading.has(item.invoiceId!) ||
+                        loading.has(item.quotation.id)
+                      }
                     />
                   ) : (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                      {loading.has(item.quotation.id) ? 'Creating...' : 'Draft'}
+                      {loading.has(item.quotation.id) ? "Creating..." : "Draft"}
                     </span>
                   )}
                 </td>
@@ -191,13 +239,22 @@ export function InvoiceTable({ initialQuotations }: InvoiceTableProps) {
                         href={`/api/invoices/${item.invoiceId}/download`}
                         className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition text-sm"
                       >
-                        Download PDF
+                        Télécharger PDF
                       </a>
                     ) : (
                       <span className="text-gray-400 text-sm">
-                        {loading.has(item.quotation.id) ? 'Preparing...' : 'Pending'}
+                        {loading.has(item.quotation.id)
+                          ? "Preparing..."
+                          : "Pending"}
                       </span>
                     )}
+                    <button
+                      onClick={() => handleSendMail(item.invoice?.id as string)}
+                      disabled={isPending}
+                      className="bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700 transition text-sm"
+                    >
+                      {isPending ? "Envoi en cours..." : "Envoyer"}
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -209,18 +266,19 @@ export function InvoiceTable({ initialQuotations }: InvoiceTableProps) {
   );
 }
 
-function InvoiceStatusSelector({ 
-  invoiceId, 
-  currentStatus: initialStatus = 'draft',
+function InvoiceStatusSelector({
+  invoiceId,
+  currentStatus: initialStatus = "draft",
   onStatusChange,
-  disabled = false
-}: { 
-  invoiceId: string; 
+  disabled = false,
+}: {
+  invoiceId: string;
   currentStatus?: InvoiceStatus;
   onStatusChange: (invoiceId: string, status: InvoiceStatus) => void;
   disabled?: boolean;
 }) {
-  const [currentStatus, setCurrentStatus] = useState<InvoiceStatus>(initialStatus);
+  const [currentStatus, setCurrentStatus] =
+    useState<InvoiceStatus>(initialStatus);
 
   // Synchronize with initial status when it changes
   useEffect(() => {
@@ -235,23 +293,35 @@ function InvoiceStatusSelector({
 
   const getStatusColor = (status: InvoiceStatus) => {
     switch (status) {
-      case 'draft': return 'bg-gray-100 text-gray-800';
-      case 'sent': return 'bg-blue-100 text-blue-800';
-      case 'paid': return 'bg-green-100 text-green-800';
-      case 'overdue': return 'bg-red-100 text-red-800';
-      case 'cancelled': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "draft":
+        return "bg-gray-100 text-gray-800";
+      case "sent":
+        return "bg-blue-100 text-blue-800";
+      case "paid":
+        return "bg-green-100 text-green-800";
+      case "overdue":
+        return "bg-red-100 text-red-800";
+      case "cancelled":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getStatusLabel = (status: InvoiceStatus) => {
     switch (status) {
-      case 'draft': return 'Draft';
-      case 'sent': return 'Sent';
-      case 'paid': return 'Paid';
-      case 'overdue': return 'Overdue';
-      case 'cancelled': return 'Cancelled';
-      default: return status;
+      case "draft":
+        return "Draft";
+      case "sent":
+        return "Sent";
+      case "paid":
+        return "Paid";
+      case "overdue":
+        return "Overdue";
+      case "cancelled":
+        return "Cancelled";
+      default:
+        return status;
     }
   };
 
@@ -260,7 +330,9 @@ function InvoiceStatusSelector({
       value={currentStatus}
       onChange={handleStatusChange}
       disabled={disabled}
-      className={`text-xs font-medium px-2.5 py-0.5 rounded-full border-0 focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed ${getStatusColor(currentStatus)}`}
+      className={`text-xs font-medium px-2.5 py-0.5 rounded-full border-0 focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed ${getStatusColor(
+        currentStatus
+      )}`}
     >
       <option value="draft">Draft</option>
       <option value="sent">Sent</option>
@@ -269,4 +341,4 @@ function InvoiceStatusSelector({
       <option value="cancelled">Cancelled</option>
     </select>
   );
-} 
+}

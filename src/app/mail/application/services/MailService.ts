@@ -12,14 +12,24 @@ export class MailService {
   async sendQuotationConfirmation(
     to: string,
     quotationId: string,
-    senderFullname: string
+    clientFirstName: string,
+    senderFullname: string,
+    invoice?: boolean
   ) {
-    const subject = "Confirmation de réception de votre devis";
+    const subject = `Confirmation de réception de votre ${
+      invoice === true ? "facture" : "devis"
+    }`;
     const html = `
-      <p>Bonjour,</p></br>
-      <p>Votre devis a bien été enregistré.</p></br>
-      <p>Vous pouvez le consulter ici : 
-         <a href="http://localhost:3000/api/quotations/${quotationId}/download">Voir le devis</a></p></br>
+      <p>Bonjour ${clientFirstName},</p></br>
+      <p>Votre ${invoice === true ? "facture" : "devis"} a bien été enregistré${
+      invoice === true ? "e" : ""
+    }.</p></br>
+      <p>Vous pouvez ${invoice === true ? "la" : "le"} consulter ici : 
+         <a href="http://localhost:3000/api/${
+           invoice === true ? "invoices" : "quotations"
+         }/${quotationId}/download">Voir ${invoice === true ? "la" : "le"} ${
+      invoice === true ? "facture" : "devis"
+    }</a></p></br>
       <p>Cordialement,</p>
       <p>${senderFullname}.</p>
     `;
