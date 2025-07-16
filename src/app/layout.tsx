@@ -7,6 +7,7 @@ import { Theme } from "@radix-ui/themes";
 import "@radix-ui/themes/styles.css";
 
 import NavBar from "../components/NavBar";
+import { AuthProvider } from "./user-auth/infrastructure/services/auth-context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,14 +34,16 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <NavBar />
-        <Theme appearance="light" accentColor="blue" radius="medium">
-          {children}
-        </Theme>
-        {/* Footer */}
-        <footer className="bg-gray-100 text-center py-4 text-sm text-gray-500">
-          © {new Date().getFullYear()} - Application Facture & Devis
-        </footer>
+        <AuthProvider>
+          <NavBar />
+          <Theme appearance="light" accentColor="blue" radius="medium">
+            {children}
+          </Theme>
+          {/* Footer */}
+          <footer className="bg-gray-100 text-center py-4 text-sm text-gray-500">
+            © {new Date().getFullYear()} - Application Facture & Devis
+          </footer>
+        </AuthProvider>
       </body>
     </html>
   );

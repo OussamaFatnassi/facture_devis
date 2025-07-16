@@ -21,13 +21,21 @@ export class GetAcceptedQuotationsUseCase {
     private invoiceRepository: InvoiceRepository
   ) {}
 
-  async execute(): Promise<GetAcceptedQuotationsResponse> {
+  async execute(userId: string): Promise<GetAcceptedQuotationsResponse> {
     try {
-      // Retrieve all quotations
-      const allQuotations = await this.quotationRepository.findAll();
+      // Retrieve quotations for the specific user
+      const userQuotations = await this.quotationRepository.findByUser(userId);
+      
+      if (!userQuotations) {
+        return {
+          success: true,
+          quotations: [],
+          message: 'No quotations found for user'
+        };
+      }
 
       // Filter accepted quotations
-      const acceptedQuotations = allQuotations.filter(q => q.status === 'accepted');
+      const acceptedQuotations = userQuotations.filter(q => q.status === 'accepted');
 
       // Check for each quotation if it already has an invoice
       const quotationsWithInvoiceInfo = await Promise.all(

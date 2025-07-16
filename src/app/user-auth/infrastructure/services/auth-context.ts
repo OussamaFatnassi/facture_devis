@@ -1,6 +1,6 @@
 "use client";
 
-import {
+import React, {
   createContext,
   useContext,
   useEffect,
@@ -29,7 +29,11 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -73,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     refreshUser();
   }, []);
 
-  const value: AuthContextType = {
+  const contextValue: AuthContextType = {
     user,
     isLoading,
     isAuthenticated: !!user,
@@ -82,7 +86,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     refreshUser,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return React.createElement(
+    AuthContext.Provider,
+    { value: contextValue },
+    children
+  );
 }
 
 export function useAuth() {
@@ -109,4 +117,4 @@ export function useRequireAuth() {
   }
 
   return { user, isLoading: false, isAuthenticated: true };
-}
+} 

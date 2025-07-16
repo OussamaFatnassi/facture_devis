@@ -40,7 +40,9 @@ model Client {
   phone         String
   email         String
   legalStatus   String
-
+  userId        String
+  
+  user          User     @relation(fields: [userId], references: [id])
   quotations    Quotation[]
   invoices      Invoice[]
 }
@@ -93,6 +95,8 @@ model User {
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+  clients   Client[]
 
   @@map("users")
 }

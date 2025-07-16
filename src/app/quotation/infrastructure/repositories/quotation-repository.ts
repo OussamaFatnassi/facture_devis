@@ -18,7 +18,7 @@ export class PrismaQuotationRepository implements QuotationRepository {
         client: {
           connect: { id: quotation.client.id },
         },
-        quotationLines: quotation.lines,
+        quotationLines: JSON.stringify(quotation.lines),
       },
     });
 
@@ -33,7 +33,9 @@ export class PrismaQuotationRepository implements QuotationRepository {
 
     if (!record) return null;
 
-    const lines = record.quotationLines as unknown as QuotationLine[];
+    const lines = typeof record.quotationLines === 'string' 
+      ? JSON.parse(record.quotationLines) 
+      : record.quotationLines as unknown as QuotationLine[];
 
     return new Quotation(
       record.id,
@@ -63,7 +65,9 @@ export class PrismaQuotationRepository implements QuotationRepository {
     });
 
     return records.map((record) => {
-      const lines = record.quotationLines as unknown as QuotationLine[];
+      const lines = typeof record.quotationLines === 'string' 
+        ? JSON.parse(record.quotationLines) 
+        : record.quotationLines as unknown as QuotationLine[];
 
       return new Quotation(
         record.id,
@@ -95,7 +99,9 @@ export class PrismaQuotationRepository implements QuotationRepository {
     });
 
     return records.map((record) => {
-      const lines = record.quotationLines as unknown as QuotationLine[];
+      const lines = typeof record.quotationLines === 'string' 
+        ? JSON.parse(record.quotationLines) 
+        : record.quotationLines as unknown as QuotationLine[];
 
       return new Quotation(
         record.id,
@@ -117,5 +123,40 @@ export class PrismaQuotationRepository implements QuotationRepository {
         record.userId
       );
     });
+  }
+
+  async update(quotation: Quotation): Promise<Quotation> {
+    const updatedRecord = await prisma.quotation.update({
+      where: { id: quotation.id },
+      data: {
+        status: quotation.status,
+        version: quotation.version,
+        quotationLines: JSON.stringify(quotation.lines),
+        taxRate: quotation.taxRate,
+      },
+      include: { client: true },
+    });
+
+    const lines = JSON.parse(updatedRecord.quotationLines as string) as QuotationLine[];
+
+    return new Quotation(
+      updatedRecord.id,
+      updatedRecord.version,
+      lines,
+      updatedRecord.status,
+      {
+        id: updatedRecord.client.id,
+        firstname: updatedRecord.client.firstname,
+        lastname: updatedRecord.client.lastname,
+        activityName: updatedRecord.client.activityName,
+        address: updatedRecord.client.address,
+        phone: updatedRecord.client.phone,
+        email: updatedRecord.client.email,
+        legalStatus: updatedRecord.client.legalStatus,
+      },
+      updatedRecord.date,
+      updatedRecord.taxRate,
+      updatedRecord.userId
+    );
   }
 }

@@ -61,8 +61,8 @@ export class InvoiceAppService {
     return await this.generateInvoiceUseCase.execute(request);
   }
 
-  async getAcceptedQuotations(): Promise<GetAcceptedQuotationsResponse> {
-    return await this.getAcceptedQuotationsUseCase.execute();
+  async getAcceptedQuotations(userId: string): Promise<GetAcceptedQuotationsResponse> {
+    return await this.getAcceptedQuotationsUseCase.execute(userId);
   }
 
   async updateInvoiceStatus(

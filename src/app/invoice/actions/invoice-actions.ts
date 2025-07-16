@@ -21,6 +21,22 @@ const invoiceAppService = new InvoiceAppService(
 
 export async function createInvoiceAsDraft(quotationId: string) {
   try {
+    // Get current user to verify quotation ownership
+    const { getCurrentUser } = await import('../../user-auth/actions/login-actions');
+    const userResponse = await getCurrentUser();
+    if (!userResponse.success || !userResponse.user) {
+      throw new Error("User not authenticated");
+    }
+
+    // Verify quotation belongs to current user
+    const quotation = await quotationRepository.findById(quotationId);
+    if (!quotation) {
+      throw new Error("Quotation not found");
+    }
+    if (quotation.userId !== userResponse.user.id) {
+      throw new Error("Access denied: Quotation does not belong to current user");
+    }
+
     const response = await invoiceAppService.generateInvoiceFromQuotation({
       quotationId,
       dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
@@ -50,6 +66,22 @@ export async function generateInvoiceFromQuotation(formData: FormData) {
 
     if (!quotationId || !dueDateStr) {
       throw new Error('Quotation ID and due date are required');
+    }
+
+    // Get current user to verify quotation ownership
+    const { getCurrentUser } = await import('../../user-auth/actions/login-actions');
+    const userResponse = await getCurrentUser();
+    if (!userResponse.success || !userResponse.user) {
+      throw new Error("User not authenticated");
+    }
+
+    // Verify quotation belongs to current user
+    const quotation = await quotationRepository.findById(quotationId);
+    if (!quotation) {
+      throw new Error("Quotation not found");
+    }
+    if (quotation.userId !== userResponse.user.id) {
+      throw new Error("Access denied: Quotation does not belong to current user");
     }
 
     const dueDate = new Date(dueDateStr);
@@ -84,6 +116,24 @@ export async function updateInvoiceStatus(formData: FormData) {
       throw new Error('Invoice ID and status are required');
     }
 
+    // Get current user to verify invoice ownership
+    const { getCurrentUser } = await import('../../user-auth/actions/login-actions');
+    const userResponse = await getCurrentUser();
+    if (!userResponse.success || !userResponse.user) {
+      throw new Error("User not authenticated");
+    }
+
+    // Verify invoice belongs to current user (via quotation)
+    const invoice = await invoiceRepository.findById(invoiceId);
+    if (!invoice) {
+      throw new Error("Invoice not found");
+    }
+    
+    const quotation = await quotationRepository.findById(invoice.quotationId);
+    if (!quotation || quotation.userId !== userResponse.user.id) {
+      throw new Error("Access denied: Invoice does not belong to current user");
+    }
+
     const response = await invoiceAppService.updateInvoiceStatus({
       invoiceId,
       newStatus
@@ -102,7 +152,14 @@ export async function updateInvoiceStatus(formData: FormData) {
 
 export async function getAcceptedQuotations() {
   try {
-    const response = await invoiceAppService.getAcceptedQuotations();
+    // Get current user to filter quotations
+    const { getCurrentUser } = await import('../../user-auth/actions/login-actions');
+    const userResponse = await getCurrentUser();
+    if (!userResponse.success || !userResponse.user) {
+      throw new Error("User not authenticated");
+    }
+
+    const response = await invoiceAppService.getAcceptedQuotations(userResponse.user.id);
     
     if (!response.success) {
       throw new Error(response.message);
@@ -148,6 +205,24 @@ export async function getAcceptedQuotations() {
 
 export async function getInvoiceById(invoiceId: string) {
   try {
+    // Get current user to verify invoice ownership
+    const { getCurrentUser } = await import('../../user-auth/actions/login-actions');
+    const userResponse = await getCurrentUser();
+    if (!userResponse.success || !userResponse.user) {
+      throw new Error("User not authenticated");
+    }
+
+    // Verify invoice belongs to current user (via quotation)
+    const invoice = await invoiceRepository.findById(invoiceId);
+    if (!invoice) {
+      throw new Error("Invoice not found");
+    }
+    
+    const quotation = await quotationRepository.findById(invoice.quotationId);
+    if (!quotation || quotation.userId !== userResponse.user.id) {
+      throw new Error("Access denied: Invoice does not belong to current user");
+    }
+
     const response = await invoiceAppService.getInvoiceById({ invoiceId });
     
     if (!response.success) {
