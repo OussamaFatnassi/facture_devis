@@ -13,3 +13,96 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Quotation {
+  id             String            @id @default(cuid())
+  version        Int
+  status         QuotationStatus
+  date           DateTime         @default(now())
+  taxRate        Float
+
+  clientId       String
+  client         Client           @relation(fields: [clientId], references: [id])
+
+  userId String
+
+  quotationLines Json             // <-- renommé ici
+  
+  invoice        Invoice?         // Relation 1:1 avec Invoice
+}
+
+model Client {
+  id            String   @id @default(cuid())
+  firstname     String
+  lastname      String
+  activityName  String
+  address       String
+  phone         String
+  email         String
+  legalStatus   String
+  userId        String
+  
+  user          User     @relation(fields: [userId], references: [id])
+  quotations    Quotation[]
+  invoices      Invoice[]
+}
+
+model Invoice {
+  id                   String         @id @default(cuid())
+  invoiceNumber        String         @unique
+  status               InvoiceStatus  @default(draft)
+  date                 DateTime       @default(now())
+  dueDate              DateTime
+  paidDate             DateTime?
+  
+  quotationId          String         @unique
+  quotation            Quotation      @relation(fields: [quotationId], references: [id])
+  
+  clientId             String
+  client               Client         @relation(fields: [clientId], references: [id])
+  
+  totalExcludingTax    Float
+  totalIncludingTax    Float
+  taxRate              Float
+  
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+}
+
+enum QuotationStatus {
+  draft
+  sent
+  accepted
+  rejected
+}
+
+
+enum InvoiceStatus {
+  draft
+  sent
+  paid
+  overdue
+  cancelled
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  role      UserRole @default(USER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  clients   Client[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+  MANAGER
+}
