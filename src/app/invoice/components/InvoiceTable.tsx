@@ -324,25 +324,6 @@ function InvoiceStatusSelector({
     }
   };
 
-
-
-  const getStatusLabel = (status: InvoiceStatus) => {
-    switch (status) {
-      case "draft":
-        return "Brouillon";
-      case "sent":
-        return "Envoyé";
-      case "paid":
-        return "Payé";
-      case "overdue":
-        return "En retard";
-      case "cancelled":
-        return "Annulé";
-      default:
-        return status;
-    }
-  };
-
   return (
     <select
       value={currentStatus}
