@@ -20,6 +20,9 @@ model Product {
   description String
   price       Float
   isActive    Boolean  @default(true)
+  userId      String
+  
+  user        User     @relation(fields: [userId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -107,6 +110,7 @@ model User {
   updatedAt DateTime @updatedAt
   
   clients   Client[]
+  products  Product[]
 
   @@map("users")
 }

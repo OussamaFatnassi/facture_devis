@@ -2,6 +2,7 @@ import { ProductRepository } from '../../domain/ProductRepository';
 
 export interface SearchProductsRequest {
   query: string;
+  userId: string;
   limit?: number;
   offset?: number;
 }
@@ -42,7 +43,7 @@ export class SearchProductsUseCase {
       }
 
       // Search products
-      const products = await this.productRepository.searchProducts(request.query);
+      const products = await this.productRepository.searchProductsByUser(request.query, request.userId);
       
       // Apply pagination if specified
       let paginatedProducts = products;
@@ -53,7 +54,7 @@ export class SearchProductsUseCase {
       }
 
       // Serialize products to plain objects
-      const serializedProducts: SerializedProduct[] = paginatedProducts.map(product => ({
+      const serializedProducts: SerializedProduct[] = paginatedProducts.map((product) => ({
         id: product.id,
         name: product.name,
         description: product.description,

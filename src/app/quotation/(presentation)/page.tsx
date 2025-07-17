@@ -436,20 +436,33 @@ export default function QuotationPage() {
               {lines.map((line, idx) => (
                 <div
                   key={idx}
-                  className="bg-gray-50 rounded-lg p-4 border border-gray-200 mb-2"
+                  className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 hover:shadow-md transition-shadow duration-200"
                 >
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-sm font-medium text-gray-700">
-                      Ligne #{idx + 1}
-                    </span>
+                  {/* Header avec numéro de ligne et bouton suppression */}
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                        <span className="text-white text-sm font-semibold">
+                          {idx + 1}
+                        </span>
+                      </div>
+                      <div>
+                        <h4 className="text-lg font-semibold text-gray-900">
+                          Ligne produit #{idx + 1}
+                        </h4>
+                        <p className="text-sm text-gray-500">
+                          Configurez les détails de votre produit
+                        </p>
+                      </div>
+                    </div>
                     {lines.length > 1 && (
                       <button
                         type="button"
                         onClick={() => removeLine(idx)}
-                        className="text-red-600 hover:text-red-800 transition-colors"
+                        className="group p-2 rounded-full hover:bg-red-50 transition-colors duration-200"
                       >
                         <svg
-                          className="w-4 h-4"
+                          className="w-5 h-5 text-red-500 group-hover:text-red-600"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -464,16 +477,34 @@ export default function QuotationPage() {
                       </button>
                     )}
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+
+                  {/* Première ligne - Produit, Quantité, Total */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-4">
+                    {/* Produit */}
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <div className="w-5 h-5 bg-emerald-100 rounded-full flex items-center justify-center">
+                          <svg
+                            className="w-3 h-3 text-emerald-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                            />
+                          </svg>
+                        </div>
                         Produit
                       </label>
                       <select
                         name="productId"
                         value={line.productId}
                         onChange={(e) => updateLine(idx, "productId", e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full h-12 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 bg-white shadow-sm"
                         required
                       >
                         <option value="">Sélectionner un produit</option>
@@ -484,37 +515,112 @@ export default function QuotationPage() {
                         ))}
                       </select>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Description
-                      </label>
-                      <div className="bg-gray-100 px-3 py-2 rounded-lg text-gray-700 min-h-[38px]">
-                        {line.productDescription}
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+
+                    {/* Quantité */}
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <div className="w-5 h-5 bg-orange-100 rounded-full flex items-center justify-center">
+                          <svg
+                            className="w-3 h-3 text-orange-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
+                            />
+                          </svg>
+                        </div>
                         Quantité
                       </label>
-                      <TextField.Root
-                        name="quantity"
-                        type="number"
-                        min={1}
-                        value={line.quantity}
-                        onChange={(e) => updateLine(idx, "quantity", e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required
-                      />
+                      <div className="relative">
+                        <input
+                          type="number"
+                          min={1}
+                          value={line.quantity}
+                          onChange={(e) => updateLine(idx, "quantity", e.target.value)}
+                          className="w-full h-12 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 bg-white shadow-sm text-center font-medium"
+                          required
+                        />
+                        <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex flex-col gap-1">
+                          <button
+                            type="button"
+                            onClick={() => updateLine(idx, "quantity", Math.max(1, (line.quantity || 1) + 1))}
+                            className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+                          >
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd"/>
+                            </svg>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => updateLine(idx, "quantity", Math.max(1, (line.quantity || 1) - 1))}
+                            className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+                          >
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd"/>
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+
+                    {/* Total */}
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                        <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
+                          <svg
+                            className="w-3 h-3 text-green-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+                            />
+                          </svg>
+                        </div>
                         Total
                       </label>
-                      <div className="flex items-center justify-center h-10 bg-white border border-gray-300 rounded-lg">
-                        <span className="text-sm font-semibold text-gray-900">
-                          {line.totalPrice.toFixed(2)} €
+                      <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl h-12 flex items-center justify-center shadow-sm">
+                        <span className="text-lg font-bold text-green-700">
+                          {line.totalPrice.toFixed(2)}
                         </span>
+                        <span className="text-green-600 font-medium ml-1">€</span>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Deuxième ligne - Description (toute la largeur) */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <div className="w-5 h-5 bg-purple-100 rounded-full flex items-center justify-center">
+                        <svg
+                          className="w-3 h-3 text-purple-600"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M4 6h16M4 12h16M4 18h16"
+                          />
+                        </svg>
+                      </div>
+                      Description
+                    </label>
+                    <div className="bg-white px-4 py-3 rounded-xl border border-gray-300 h-12 flex items-center shadow-sm">
+                      <span className="text-gray-700 text-sm">
+                        {line.productDescription || "Sélectionnez un produit pour voir la description"}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -522,47 +628,75 @@ export default function QuotationPage() {
               <button
                 type="button"
                 onClick={addLine}
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:text-blue-600 hover:border-blue-300 transition-colors"
+                className="group w-full flex items-center justify-center gap-3 py-4 px-6 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 hover:text-blue-600 hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 shadow-sm hover:shadow-md"
               >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  />
-                </svg>
-                Ajouter une ligne
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-200">
+                  <svg
+                    className="w-5 h-5 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                    />
+                  </svg>
+                </div>
+                <div className="text-left">
+                  <div className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                    Ajouter une ligne produit
+                  </div>
+                  <div className="text-sm text-gray-500 group-hover:text-blue-500 transition-colors">
+                    Cliquez pour ajouter un nouveau produit à votre devis
+                  </div>
+                </div>
               </button>
             </div>
 
             {/* Total Summary */}
-            <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200 shadow-lg">
               <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-900">
-                    Récapitulatif
-                  </h4>
-                  <p className="text-sm text-gray-600">Total de votre devis</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
+                    <svg
+                      className="w-6 h-6 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold text-gray-900">
+                      Récapitulatif du devis
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      Montant total de votre devis
+                    </p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm text-gray-600">
-                    Total HT:{" "}
-                    <span className="font-semibold">
+                <div className="text-right space-y-2">
+                  <div className="bg-white rounded-lg p-3 shadow-sm border border-gray-200">
+                    <p className="text-sm text-gray-600 mb-1">Total</p>
+                    <p className="text-lg font-bold text-gray-900">
                       {calculateTotalHT().toFixed(2)} €
-                    </span>
-                  </p>
-                  <p className="text-xl font-bold text-gray-900">
-                    Total TTC:{" "}
-                    <span className="text-blue-600">
+                    </p>
+                  </div>
+                  <div className="bg-gradient-to-r from-blue-100 to-indigo-100 rounded-lg p-3 shadow-sm border border-blue-200">
+                    <p className="text-sm text-blue-600 mb-1">Total TTC</p>
+                    <p className="text-2xl font-bold text-blue-700">
                       {(calculateTotalHT() * 1.2).toFixed(2)} €
-                    </span>
-                  </p>
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>

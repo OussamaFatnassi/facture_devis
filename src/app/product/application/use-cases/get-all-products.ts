@@ -2,6 +2,7 @@ import { Product } from '../../domain/Product';
 import { ProductRepository } from '../../domain/ProductRepository';
 
 export interface GetAllProductsRequest {
+  userId: string;
   limit?: number;
   offset?: number;
   activeOnly?: boolean;
@@ -28,7 +29,7 @@ export interface GetAllProductsResponse {
 export class GetAllProductsUseCase {
   constructor(private productRepository: ProductRepository) {}
 
-  async execute(request: GetAllProductsRequest = {}): Promise<GetAllProductsResponse> {
+  async execute(request: GetAllProductsRequest): Promise<GetAllProductsResponse> {
     try {
       // Input validation
       const validationErrors = this.validateRequest(request);
@@ -45,9 +46,9 @@ export class GetAllProductsUseCase {
       // Get products based on filters
       let products: Product[];
       if (request.activeOnly) {
-        products = await this.productRepository.findActiveProducts();
+        products = await this.productRepository.findActiveProductsByUser(request.userId);
       } else {
-        products = await this.productRepository.findAll(request.limit, request.offset);
+        products = await this.productRepository.findByUser(request.userId, request.limit, request.offset);
       }
 
       // Serialize products to plain objects

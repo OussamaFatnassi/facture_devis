@@ -12,24 +12,24 @@ export interface ProductRepository {
   findById(id: string): Promise<Product | null>;
 
   /**
-   * Find product by name
+   * Find product by name for a specific user
    */
-  findByName(name: string): Promise<Product | null>;
+  findByName(name: string, userId: string): Promise<Product | null>;
 
   /**
-   * Find all products with optional pagination
+   * Find all products for a specific user with optional pagination
    */
-  findAll(limit?: number, offset?: number): Promise<Product[]>;
+  findByUser(userId: string, limit?: number, offset?: number): Promise<Product[]>;
 
   /**
-   * Find active products only
+   * Find active products only for a specific user
    */
-  findActiveProducts(): Promise<Product[]>;
+  findActiveProductsByUser(userId: string): Promise<Product[]>;
 
   /**
-   * Search products by name or description
+   * Search products by name or description for a specific user
    */
-  searchProducts(query: string): Promise<Product[]>;
+  searchProductsByUser(query: string, userId: string): Promise<Product[]>;
 
   /**
    * Check if product exists
@@ -42,7 +42,7 @@ export interface ProductRepository {
   delete(id: string): Promise<void>;
 
   /**
-   * Find products by price range
+   * Find products by price range for a specific user
    */
-  findByPriceRange(minPrice: number, maxPrice: number): Promise<Product[]>;
+  findByPriceRangeByUser(minPrice: number, maxPrice: number, userId: string): Promise<Product[]>;
 } 

@@ -5,6 +5,7 @@ export interface CreateProductRequest {
   name: string;
   description: string;
   price: number;
+  userId: string;
 }
 
 export interface SerializedProduct {
@@ -39,8 +40,8 @@ export class CreateProductUseCase {
         };
       }
 
-      // Check if product with same name already exists
-      const existingProduct = await this.productRepository.findByName(request.name);
+      // Check if product with same name already exists for this user
+      const existingProduct = await this.productRepository.findByName(request.name, request.userId);
       if (existingProduct) {
         return {
           success: false,
@@ -54,7 +55,8 @@ export class CreateProductUseCase {
         name: request.name.trim(),
         description: request.description.trim(),
         price: request.price,
-        isActive: true
+        isActive: true,
+        userId: request.userId
       });
 
       // Validate product
