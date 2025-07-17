@@ -33,9 +33,10 @@ export class PrismaQuotationRepository implements QuotationRepository {
 
     if (!record) return null;
 
-    const lines = typeof record.quotationLines === 'string' 
-      ? JSON.parse(record.quotationLines) 
-      : record.quotationLines as unknown as QuotationLine[];
+    const lines =
+      typeof record.quotationLines === "string"
+        ? JSON.parse(record.quotationLines)
+        : (record.quotationLines as unknown as QuotationLine[]);
 
     return new Quotation(
       record.id,
@@ -65,9 +66,10 @@ export class PrismaQuotationRepository implements QuotationRepository {
     });
 
     return records.map((record) => {
-      const lines = typeof record.quotationLines === 'string' 
-        ? JSON.parse(record.quotationLines) 
-        : record.quotationLines as unknown as QuotationLine[];
+      const lines =
+        typeof record.quotationLines === "string"
+          ? JSON.parse(record.quotationLines)
+          : (record.quotationLines as unknown as QuotationLine[]);
 
       return new Quotation(
         record.id,
@@ -99,9 +101,10 @@ export class PrismaQuotationRepository implements QuotationRepository {
     });
 
     return records.map((record) => {
-      const lines = typeof record.quotationLines === 'string' 
-        ? JSON.parse(record.quotationLines) 
-        : record.quotationLines as unknown as QuotationLine[];
+      const lines =
+        typeof record.quotationLines === "string"
+          ? JSON.parse(record.quotationLines)
+          : (record.quotationLines as unknown as QuotationLine[]);
 
       return new Quotation(
         record.id,
@@ -137,7 +140,9 @@ export class PrismaQuotationRepository implements QuotationRepository {
       include: { client: true },
     });
 
-    const lines = JSON.parse(updatedRecord.quotationLines as string) as QuotationLine[];
+    const lines = JSON.parse(
+      updatedRecord.quotationLines as string
+    ) as QuotationLine[];
 
     return new Quotation(
       updatedRecord.id,
