@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# facture_devis
 
-## Getting Started
+Application de gestion de factures et devis  
+Basée sur **Next.js**, **Prisma** et **React** en **DDD**.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Sommaire
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- [facture\_devis](#facture_devis)
+  - [Sommaire](#sommaire)
+  - [Fonctionnalités](#fonctionnalités)
+  - [Prérequis](#prérequis)
+  - [Installation](#installation)
+  - [Configuration](#configuration)
+  - [Préparation de la base de données](#préparation-de-la-base-de-données)
+  - [Démarrer le projet](#démarrer-le-projet)
+  - [Tests](#tests)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Fonctionnalités
 
-## Learn More
+- Création et gestion de **factures** et **devis**
+- Authentification JWT avec **bcryptjs**
+- Génération de PDF (via **pdf-lib**)
+- Envoi d’e-mails (via **nodemailer**)
+- Interface moderne avec **React**, **Radix UI** et **TailwindCSS**
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Prérequis
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Node.js (version recommandée : 20+)
+- npm (ou yarn)
+- **PostgreSQL** (pour la base de données)
+- Un serveur SMTP (Mailtrap, Ethereal, Gmail… pour l’envoi d’e-mails)
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Installation
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Cloner le dépôt :**
+
+   ```bash
+   git clone https://github.com/tonutilisateur/facture_devis.git
+   cd facture_devis
+   ```
+
+## Configuration
+
+1. **Créer le fichier .env à la racine du projet (voir .env.example) :**
+
+   ```bash
+    # Base de données PostgreSQL
+    DATABASE_URL="postgresql://<user>:<password>@localhost:5432/<db_name>?schema=public"
+
+    # URL publique de l’application
+    NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+    # Configuration SMTP pour l’envoi d’e-mails
+    SMTP_HOST=smtp.example.com
+    SMTP_PORT=587
+    SMTP_USER=ton_email@example.com
+    SMTP_PASS=ton_mot_de_passe_smtp
+   ```
+
+   **Créez un compte MailTrap et ensuite dans l'onglet Sandbox et sous le volet 'SMTP' puis 'Credentials', vous trouverez les informations (Host, Port, Username, Password) de votre serveur SMTP de test (voir l'image ci-dessous) :**
+   ![alt text](image.png)
+
+## Préparation de la base de données
+
+1. **Générer le client Prisma**
+   ```bash
+   npx prisma generate
+   ```
+2. **Créer la base de données et appliquer les migrations**
+   ```bash
+   npx prisma migrate dev
+   ```
+
+## Démarrer le projet
+
+1. **Lancer le serveur de développement**
+   ```bash
+   npm run dev
+   ```
+
+## Tests
+
+1. **Lancer les tests**
+   ```bash
+   npm run test
+   ```
