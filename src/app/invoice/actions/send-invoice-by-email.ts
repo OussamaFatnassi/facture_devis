@@ -37,10 +37,7 @@ export async function sendInvoiceMail(invoiceId: string) {
       true
     );
 
-    await updateInvoiceStatus(
-      invoiceId,
-      "sent"
-    );
+    await updateInvoiceStatus(invoiceId, "sent");
 
     return { message: "Email sent." };
   } catch (error) {
@@ -73,18 +70,20 @@ async function updateInvoiceStatus(
     if (!quotation || quotation.userId !== userResponse.user.id) {
       throw new Error("Access denied: Invoice does not belong to current user");
     }
-
-    const response = await invoiceAppService.updateInvoiceStatus({
-      invoiceId,
-      newStatus,
-    });
-
-    if (!response.success) {
-      throw new Error(response.message);
+    let response;
+    if (invoice.status === "draft") {
+      response = await invoiceAppService.updateInvoiceStatus({
+        invoiceId,
+        newStatus,
+      });
+      if (!response.success) {
+        throw new Error(response.message);
+      }
+      return { success: true, message: response.message };
     }
 
     revalidatePath("/invoice");
-    return { success: true, message: response.message };
+    return { success: true };
   } catch (error) {
     throw new Error(
       error instanceof Error ? error.message : "Failed to update invoice status"
