@@ -10,6 +10,7 @@ import { TextField } from "@radix-ui/themes";
 import Link from "next/link";
 import { ClientInfo } from "../domain/Quotation";
 import { getAllProducts } from "../../product/actions/product-actions";
+import { NotificationPopup, NotificationType } from "../components/NotificationPopup";
 
 export default function QuotationPage() {
   const [lines, setLines] = useState([
@@ -20,6 +21,30 @@ export default function QuotationPage() {
   const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [showNewClientForm, setShowNewClientForm] = useState(false);
   const [isCreatingClient, setIsCreatingClient] = useState(false);
+  
+  // États pour la notification
+  const [notification, setNotification] = useState<{
+    message: string;
+    type: NotificationType;
+    isVisible: boolean;
+  }>({
+    message: "",
+    type: "info",
+    isVisible: false,
+  });
+
+  // Fonction pour afficher les notifications
+  const showNotification = (message: string, type: NotificationType) => {
+    setNotification({
+      message,
+      type,
+      isVisible: true,
+    });
+  };
+
+  const hideNotification = () => {
+    setNotification(prev => ({ ...prev, isVisible: false }));
+  };
 
   // Load clients on component mount
   useEffect(() => {
@@ -112,7 +137,7 @@ export default function QuotationPage() {
     e.preventDefault();
 
     if (!selectedClientId && !showNewClientForm) {
-      alert("Veuillez sélectionner un client ou créer un nouveau client");
+      showNotification("Veuillez sélectionner un client ou créer un nouveau client", "warning");
       return;
     }
 
@@ -132,14 +157,15 @@ export default function QuotationPage() {
     try {
       const response = await createQuotation(formData);
       if (response.success) {
-        alert("Devis créé avec succès !");
-        window.location.href = "/quotation/list";
+        showNotification("Devis créé avec succès !", "success");
+        // Ne pas rediriger immédiatement pour laisser le temps de voir le popup
+        // La redirection se fera via les boutons du popup
       } else {
-        alert("Erreur lors de la création du devis");
+        showNotification("Erreur lors de la création du devis", "error");
       }
     } catch (error) {
       console.error("Error creating quotation:", error);
-      alert("Erreur lors de la création du devis");
+      showNotification("Erreur lors de la création du devis", "error");
     }
   };
 
@@ -745,6 +771,14 @@ export default function QuotationPage() {
           </form>
         </div>
       </div>
+      
+      {/* Popup de notification */}
+      <NotificationPopup
+        message={notification.message}
+        type={notification.type}
+        isVisible={notification.isVisible}
+        onClose={hideNotification}
+      />
     </div>
   );
 }
