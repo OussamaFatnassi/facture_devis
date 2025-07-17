@@ -234,7 +234,7 @@ export function InvoiceTable({ initialQuotations }: InvoiceTableProps) {
                     />
                   ) : (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                      {loading.has(item.quotation.id) ? "Creating..." : "Draft"}
+                      {loading.has(item.quotation.id) ? "Création..." : "Brouillon"}
                     </span>
                   )}
                 </td>
@@ -250,8 +250,8 @@ export function InvoiceTable({ initialQuotations }: InvoiceTableProps) {
                     ) : (
                       <span className="text-gray-400 text-sm">
                         {loading.has(item.quotation.id)
-                          ? "Preparing..."
-                          : "Pending"}
+                          ? "Préparation..."
+                          : "En attente"}
                       </span>
                     )}
                     {(item.invoiceId || item.invoice?.id) && (
@@ -316,18 +316,20 @@ function InvoiceStatusSelector({
     }
   };
 
+
+
   const getStatusLabel = (status: InvoiceStatus) => {
     switch (status) {
       case "draft":
-        return "Draft";
+        return "Brouillon";
       case "sent":
-        return "Sent";
+        return "Envoyé";
       case "paid":
-        return "Paid";
+        return "Payé";
       case "overdue":
-        return "Overdue";
+        return "En retard";
       case "cancelled":
-        return "Cancelled";
+        return "Annulé";
       default:
         return status;
     }
@@ -342,11 +344,11 @@ function InvoiceStatusSelector({
         currentStatus
       )}`}
     >
-      <option value="draft">Draft</option>
-      <option value="sent">Sent</option>
-      <option value="paid">Paid</option>
-      <option value="overdue">Overdue</option>
-      <option value="cancelled">Cancelled</option>
+      <option value="draft">Brouillon</option>
+      <option value="sent">Envoyé</option>
+      <option value="paid">Payé</option>
+      <option value="overdue">En retard</option>
+      <option value="cancelled">Annulé</option>
     </select>
   );
 }
