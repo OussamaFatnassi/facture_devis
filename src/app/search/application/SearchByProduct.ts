@@ -4,17 +4,18 @@ import { InvoiceRepository } from "@/src/app/invoice/domain/InvoiceRepository";
 
 export async function searchByProduct(
   productName: string,
+  userId: string,
   quotationRepo: QuotationRepository,
   invoiceRepo: InvoiceRepository
 ): Promise<SearchResult> {
   const query = productName.toLowerCase();
   const [quotations, invoices] = await Promise.all([
-    quotationRepo.findAll(),
-    invoiceRepo.findAll(),
+    quotationRepo.findByUser(userId),
+    invoiceRepo.findByUser(userId),
   ]);
 
   return {
-    quotations: quotations.filter((q) =>
+    quotations: (quotations || []).filter((q) =>
       q.lines.some((line) => line.productName.toLowerCase().includes(query))
     ),
     invoices: invoices.filter((inv) =>

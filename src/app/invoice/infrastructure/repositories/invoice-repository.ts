@@ -85,6 +85,22 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
     return results.map(result => this.mapToDomain(result));
   }
 
+  async findByUser(userId: string): Promise<Invoice[]> {
+    const results = await this.prisma.invoice.findMany({
+      where: {
+        client: {
+          userId: userId
+        }
+      },
+      include: {
+        quotation: true,
+        client: true
+      }
+    });
+
+    return results.map(result => this.mapToDomain(result));
+  }
+
   async findByClientId(clientId: string): Promise<Invoice[]> {
     const results = await this.prisma.invoice.findMany({
       where: { clientId },
