@@ -15,6 +15,9 @@ export function middleware(request: NextRequest) {
     "/user-auth/signup",
     "/api/auth/login",
     "/api/auth/register",
+    "/quotation/api",
+    "/invoice/api",
+   
   ];
 
   // Check if the current path is a public route

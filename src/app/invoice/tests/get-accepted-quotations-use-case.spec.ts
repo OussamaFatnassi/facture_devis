@@ -3,7 +3,6 @@ import { Quotation } from "../../quotation/domain/Quotation";
 import { Invoice } from "../domain/Invoice";
 import { ClientInfo, QuotationLine } from "../../quotation/domain/Quotation";
 
-// Mocks des repositories
 const mockQuotationRepository = {
   findByUser: jest.fn(),
 };

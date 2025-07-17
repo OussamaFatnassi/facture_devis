@@ -58,7 +58,7 @@ export default async function QuotationDetailPage({ params }: Props) {
           <ul className="list-disc pl-6 mt-2 space-y-1">
             {quotation.lines.map((line, idx) => (
               <li key={idx}>
-                {line.description} — {line.quantity} x {line.unitPrice} € ={" "}
+                {line.productName} — {line.quantity} x {line.unitPrice} € ={" "}
                 {line.totalPrice.toFixed(2)} €
               </li>
             ))}
@@ -73,7 +73,7 @@ export default async function QuotationDetailPage({ params }: Props) {
       </div>
       <div className="mt-8 flex gap-4">
         <a
-          href={`/api/quotations/${quotation.id}/download`}
+          href={`/quotation/api/${quotation.id}/download`}
           target="_blank"
           className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition text-sm"
         >

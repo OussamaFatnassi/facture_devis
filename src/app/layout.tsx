@@ -39,10 +39,6 @@ export default function RootLayout({
           <Theme appearance="light" accentColor="blue" radius="medium">
             {children}
           </Theme>
-          {/* Footer */}
-          <footer className="bg-gray-100 text-center py-4 text-sm text-gray-500">
-            © {new Date().getFullYear()} - Application Facture & Devis
-          </footer>
         </AuthProvider>
       </body>
     </html>

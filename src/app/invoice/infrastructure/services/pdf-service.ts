@@ -32,20 +32,20 @@ export class InvoicePdfService {
       page.drawImage(logoImage, { x: 500, y: 770, width: 50, height: 50 });
     }
 
-    // Header - INVOICE instead of QUOTE
-    drawText("INVOICE", 26, margin, rgb(0.2, 0.2, 0.6), boldFont);
+    // Header - FACTURE instead of QUOTE
+    drawText("FACTURE", 26, margin, rgb(0.2, 0.2, 0.6), boldFont);
     y -= 10;
     drawText(`N° ${invoice.invoiceNumber}`, 12, margin, rgb(0, 0, 0), boldFont);
     drawText(`Date: ${invoice.date.toLocaleDateString()}`, 10);
-    drawText(`Due Date: ${invoice.dueDate.toLocaleDateString()}`, 10);
-    drawText(`Status: ${invoice.status.toUpperCase()}`, 10, margin, this.getStatusColor(invoice.status));
+    drawText(`Date d'échéance: ${invoice.dueDate.toLocaleDateString()}`, 10);
+    drawText(`Statut: ${this.getStatusLabel(invoice.status)}`, 10, margin, this.getStatusColor(invoice.status));
     if (invoice.paidDate) {
-      drawText(`Paid on: ${invoice.paidDate.toLocaleDateString()}`, 10, margin, rgb(0, 0.7, 0));
+      drawText(`Payé le: ${invoice.paidDate.toLocaleDateString()}`, 10, margin, rgb(0, 0.7, 0));
     }
     y -= 10;
 
     // Client information
-    drawText("Client Information:", 14, margin, rgb(0.1, 0.1, 0.4), boldFont);
+    drawText("Informations client:", 14, margin, rgb(0.1, 0.1, 0.4), boldFont);
     drawText(`${invoice.client.firstname} ${invoice.client.lastname}`);
     drawText(invoice.client.activityName);
     drawText(invoice.client.email);
@@ -56,9 +56,9 @@ export class InvoicePdfService {
     y -= 20;
 
     // Quote reference
-    drawText("Reference:", 14, margin, rgb(0.1, 0.1, 0.4), boldFont);
-    drawText(`Quote N°: ${invoice.quotationId}`);
-    drawText(`Quote Date: ${invoice.quotation.date.toLocaleDateString()}`);
+    drawText("Référence:", 14, margin, rgb(0.1, 0.1, 0.4), boldFont);
+    drawText(`Devis N°: ${invoice.quotationId}`);
+    drawText(`Date du devis: ${invoice.quotation.date.toLocaleDateString()}`);
 
     y -= 20;
 
@@ -79,8 +79,8 @@ export class InvoicePdfService {
       color: rgb(0.85, 0.9, 1),
     });
     page.drawText("Description", { x: colX.desc, y, size: 12, font: boldFont });
-    page.drawText("Quantity", { x: colX.qty, y, size: 12, font: boldFont });
-    page.drawText("Unit Price", { x: colX.pu, y, size: 12, font: boldFont });
+    page.drawText("Quantité", { x: colX.qty, y, size: 12, font: boldFont });
+    page.drawText("Prix unitaire", { x: colX.pu, y, size: 12, font: boldFont });
     page.drawText("Total", { x: colX.total, y, size: 12, font: boldFont });
 
     y -= 24;
@@ -96,7 +96,7 @@ export class InvoicePdfService {
         color: rowBg,
       });
 
-      page.drawText(line.description, { x: colX.desc, y, size: 10, font });
+      page.drawText(line.productName, { x: colX.desc, y, size: 10, font });
       page.drawText(String(line.quantity), { x: colX.qty, y, size: 10, font });
       page.drawText(`${line.unitPrice.toFixed(2)} €`, {
         x: colX.pu,
@@ -115,36 +115,36 @@ export class InvoicePdfService {
 
     y -= 20;
 
-    // Totals
+    // Totaux
     drawText(
-      `Total excl. VAT: ${invoice.totalExcludingTax.toFixed(2)} €`,
+      `Total HT: ${invoice.totalExcludingTax.toFixed(2)} €`,
       12,
       colX.total,
       rgb(0, 0, 0),
       boldFont
     );
     drawText(
-      `VAT (${invoice.taxRate}%): ${invoice.taxAmount.toFixed(2)} €`,
+      `TVA (${invoice.taxRate}%): ${invoice.taxAmount.toFixed(2)} €`,
       12,
       colX.total,
       rgb(0, 0, 0),
       boldFont
     );
     drawText(
-      `Total incl. VAT: ${invoice.totalIncludingTax.toFixed(2)} €`,
+      `Total TTC: ${invoice.totalIncludingTax.toFixed(2)} €`,
       12,
       colX.total,
       rgb(0.2, 0.2, 0.6),
       boldFont
     );
 
-    // Payment terms
+    // Conditions de paiement
     y -= 30;
-    drawText("Payment Terms:", 12, margin, rgb(0.1, 0.1, 0.4), boldFont);
-    drawText(`Due Date: ${invoice.dueDate.toLocaleDateString()}`);
+    drawText("Conditions de paiement:", 12, margin, rgb(0.1, 0.1, 0.4), boldFont);
+    drawText(`Date d'échéance: ${invoice.dueDate.toLocaleDateString()}`);
     
     if (invoice.isOverdue && !invoice.isPaid) {
-      drawText("⚠️ OVERDUE INVOICE", 12, margin, rgb(1, 0, 0), boldFont);
+      drawText("⚠️ FACTURE EN RETARD", 12, margin, rgb(1, 0, 0), boldFont);
     }
 
     // Footer
@@ -180,6 +180,23 @@ export class InvoicePdfService {
         return rgb(0.5, 0.5, 0.5);
       default:
         return rgb(0, 0, 0);
+    }
+  }
+
+  private getStatusLabel(status: string) {
+    switch (status) {
+      case 'draft':
+        return 'Brouillon';
+      case 'sent':
+        return 'Envoyé';
+      case 'paid':
+        return 'Payé';
+      case 'overdue':
+        return 'En retard';
+      case 'cancelled':
+        return 'Annulé';
+      default:
+        return status;
     }
   }
 }

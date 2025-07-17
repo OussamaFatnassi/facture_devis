@@ -2,18 +2,18 @@ import { GetAllQuotations } from "../application/use-cases/get-all-quotations";
 import { ClientInfo, Quotation, QuotationLine } from "../domain/Quotation";
 import { QuotationRepository } from "../domain/QuotationRepository";
 
-// Création d'un mock du repository
+
 const mockQuotationRepo: jest.Mocked<QuotationRepository> = {
   findAll: jest.fn(),
 };
 
 describe("GetAllQuotations", () => {
   beforeEach(() => {
-    jest.clearAllMocks(); // Réinitialise les mocks avant chaque test
+    jest.clearAllMocks(); 
   });
 
   it("should return all quotations from the repository", async () => {
-    // Préparation des données de test
+
     const lines: QuotationLine[] = [
       { description: "Produit 1", quantity: 2, unitPrice: 50, totalPrice: 100 },
       { description: "Produit 2", quantity: 1, unitPrice: 150, totalPrice: 150 },

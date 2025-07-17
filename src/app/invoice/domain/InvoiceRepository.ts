@@ -27,6 +27,11 @@ export interface InvoiceRepository {
   findAll(): Promise<Invoice[]>;
 
   /**
+   * Find invoices by user ID
+   */
+  findByUser(userId: string): Promise<Invoice[]>;
+
+  /**
    * Find invoices by client ID
    */
   findByClientId(clientId: string): Promise<Invoice[]>;
