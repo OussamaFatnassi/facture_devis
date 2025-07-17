@@ -8,7 +8,6 @@ import { PrismaQuotationRepository } from "../../quotation/infrastructure/reposi
 import { InvoiceService } from "../domain/InvoiceService";
 import { InvoiceStatus } from "../domain/Invoice";
 
-// Initialize services
 const invoiceRepository = new PrismaInvoiceRepository();
 const quotationRepository = new PrismaQuotationRepository();
 const invoiceService = new InvoiceService();

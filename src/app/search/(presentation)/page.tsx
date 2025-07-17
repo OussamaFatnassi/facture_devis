@@ -71,9 +71,8 @@ export default function SearchPage() {
       } finally {
         setIsLoading(false);
       }
-    }, 1000); // <-- 1 seconde
+    }, 1000);
 
-    // Cleanup
     return () => clearTimeout(timeout);
   }, [query]);
 
@@ -100,13 +99,11 @@ export default function SearchPage() {
     }
   };
 
-  // Fusion des résultats pour affichage en grille
   const mergedResults = [
     ...results.quotations.map((q) => ({ type: "quotation", ...q })),
     ...results.invoices.map((inv) => ({ type: "invoice", ...inv })),
   ];
 
-  // Option : trier par date descendante (plus récent en premier)
   mergedResults.sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );

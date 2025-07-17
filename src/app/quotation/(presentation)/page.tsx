@@ -1,27 +1,33 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  createQuotation,
-  getAllClients,
-  createClient,
-} from "../actions/quotation-actions";
+import { createQuotation, getAllClients } from "../actions/quotation-actions";
 import { TextField } from "@radix-ui/themes";
 import Link from "next/link";
 import { ClientInfo } from "../domain/Quotation";
 import { getAllProducts } from "../../product/actions/product-actions";
-import { NotificationPopup, NotificationType } from "../components/NotificationPopup";
+import {
+  NotificationPopup,
+  NotificationType,
+} from "../components/NotificationPopup";
+import { Product } from "@/generated/prisma";
 
 export default function QuotationPage() {
   const [lines, setLines] = useState([
-    { productId: "", productName: "", productDescription: "", quantity: 1, unitPrice: 0, totalPrice: 0 },
+    {
+      productId: "",
+      productName: "",
+      productDescription: "",
+      quantity: 1,
+      unitPrice: 0,
+      totalPrice: 0,
+    },
   ]);
   const [clients, setClients] = useState<ClientInfo[]>([]);
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [showNewClientForm, setShowNewClientForm] = useState(false);
-  const [isCreatingClient, setIsCreatingClient] = useState(false);
-  
+
   // États pour la notification
   const [notification, setNotification] = useState<{
     message: string;
@@ -43,7 +49,7 @@ export default function QuotationPage() {
   };
 
   const hideNotification = () => {
-    setNotification(prev => ({ ...prev, isVisible: false }));
+    setNotification((prev) => ({ ...prev, isVisible: false }));
   };
 
   // Load clients on component mount
@@ -74,26 +80,17 @@ export default function QuotationPage() {
     }
   };
 
-  const handleCreateClient = async (formData: FormData) => {
-    setIsCreatingClient(true);
-    try {
-      const response = await createClient(formData);
-      if (response.success && response.data) {
-        await loadClients(); // Reload clients
-        setSelectedClientId(response.data.id); // Select the new client
-        setShowNewClientForm(false); // Hide form
-      }
-    } catch (error) {
-      console.error("Error creating client:", error);
-    } finally {
-      setIsCreatingClient(false);
-    }
-  };
-
   const addLine = () =>
     setLines([
       ...lines,
-      { productId: "", productName: "", productDescription: "", quantity: 1, unitPrice: 0, totalPrice: 0 },
+      {
+        productId: "",
+        productName: "",
+        productDescription: "",
+        quantity: 1,
+        unitPrice: 0,
+        totalPrice: 0,
+      },
     ]);
 
   const removeLine = (index: number) => {
@@ -115,18 +112,13 @@ export default function QuotationPage() {
         };
       }
     } else if (field === "quantity") {
-      const qty = typeof value === "string" ? parseInt(value) : (value as number);
+      const qty =
+        typeof value === "string" ? parseInt(value) : (value as number);
       const quantity = isNaN(qty) ? 1 : qty;
       newLines[index].quantity = quantity;
       newLines[index].totalPrice = newLines[index].unitPrice * quantity;
     }
     setLines(newLines);
-  };
-
-  const calculateLineTotal = (quantity: number, unitPrice: number) => {
-    const qty = isNaN(quantity) ? 0 : quantity;
-    const price = isNaN(unitPrice) ? 0 : unitPrice;
-    return qty * price;
   };
 
   const calculateTotalHT = () => {
@@ -137,7 +129,10 @@ export default function QuotationPage() {
     e.preventDefault();
 
     if (!selectedClientId && !showNewClientForm) {
-      showNotification("Veuillez sélectionner un client ou créer un nouveau client", "warning");
+      showNotification(
+        "Veuillez sélectionner un client ou créer un nouveau client",
+        "warning"
+      );
       return;
     }
 
@@ -529,7 +524,9 @@ export default function QuotationPage() {
                       <select
                         name="productId"
                         value={line.productId}
-                        onChange={(e) => updateLine(idx, "productId", e.target.value)}
+                        onChange={(e) =>
+                          updateLine(idx, "productId", e.target.value)
+                        }
                         className="w-full h-12 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 bg-white shadow-sm"
                         required
                       >
@@ -567,27 +564,57 @@ export default function QuotationPage() {
                           type="number"
                           min={1}
                           value={line.quantity}
-                          onChange={(e) => updateLine(idx, "quantity", e.target.value)}
+                          onChange={(e) =>
+                            updateLine(idx, "quantity", e.target.value)
+                          }
                           className="w-full h-12 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 bg-white shadow-sm text-center font-medium"
                           required
                         />
                         <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex flex-col gap-1">
                           <button
                             type="button"
-                            onClick={() => updateLine(idx, "quantity", Math.max(1, (line.quantity || 1) + 1))}
+                            onClick={() =>
+                              updateLine(
+                                idx,
+                                "quantity",
+                                Math.max(1, (line.quantity || 1) + 1)
+                              )
+                            }
                             className="text-gray-400 hover:text-gray-600 transition-colors p-1"
                           >
-                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd"/>
+                            <svg
+                              className="w-3 h-3"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
+                                clipRule="evenodd"
+                              />
                             </svg>
                           </button>
                           <button
                             type="button"
-                            onClick={() => updateLine(idx, "quantity", Math.max(1, (line.quantity || 1) - 1))}
+                            onClick={() =>
+                              updateLine(
+                                idx,
+                                "quantity",
+                                Math.max(1, (line.quantity || 1) - 1)
+                              )
+                            }
                             className="text-gray-400 hover:text-gray-600 transition-colors p-1"
                           >
-                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd"/>
+                            <svg
+                              className="w-3 h-3"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                clipRule="evenodd"
+                              />
                             </svg>
                           </button>
                         </div>
@@ -618,7 +645,9 @@ export default function QuotationPage() {
                         <span className="text-lg font-bold text-green-700">
                           {line.totalPrice.toFixed(2)}
                         </span>
-                        <span className="text-green-600 font-medium ml-1">€</span>
+                        <span className="text-green-600 font-medium ml-1">
+                          €
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -645,7 +674,8 @@ export default function QuotationPage() {
                     </label>
                     <div className="bg-white px-4 py-3 rounded-xl border border-gray-300 h-12 flex items-center shadow-sm">
                       <span className="text-gray-700 text-sm">
-                        {line.productDescription || "Sélectionnez un produit pour voir la description"}
+                        {line.productDescription ||
+                          "Sélectionnez un produit pour voir la description"}
                       </span>
                     </div>
                   </div>
@@ -771,7 +801,7 @@ export default function QuotationPage() {
           </form>
         </div>
       </div>
-      
+
       {/* Popup de notification */}
       <NotificationPopup
         message={notification.message}
