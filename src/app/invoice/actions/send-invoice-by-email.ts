@@ -39,7 +39,7 @@ export async function sendInvoiceMail(invoiceId: string) {
 
     await updateInvoiceStatus(
       invoiceId,
-      invoiceClient?.status as InvoiceStatus
+      "sent"
     );
 
     return { message: "Email sent." };
@@ -52,9 +52,9 @@ export async function sendInvoiceMail(invoiceId: string) {
 
 async function updateInvoiceStatus(
   invoiceId: string,
-  invoiceStatus: InvoiceStatus
+  newStatus: InvoiceStatus
 ) {
-  if (!invoiceId || !invoiceStatus) {
+  if (!invoiceId || !newStatus) {
     throw new Error("Invoice ID and status are required");
   }
   try {
@@ -74,7 +74,6 @@ async function updateInvoiceStatus(
       throw new Error("Access denied: Invoice does not belong to current user");
     }
 
-    const newStatus = "sent" as InvoiceStatus;
     const response = await invoiceAppService.updateInvoiceStatus({
       invoiceId,
       newStatus,

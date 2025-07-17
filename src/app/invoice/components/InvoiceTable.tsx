@@ -136,12 +136,18 @@ export function InvoiceTable({ initialQuotations }: InvoiceTableProps) {
   ) => {
     setQuotations((prev) =>
       prev.map((q) => {
-        if (q.invoiceId === invoiceId && q.invoice) {
+        if (q.invoiceId === invoiceId) {
           return {
             ...q,
-            invoice: {
+            invoice: q.invoice ? {
               ...q.invoice,
               status: newStatus,
+            } : {
+              id: invoiceId,
+              status: newStatus,
+              invoiceNumber: "",
+              date: new Date().toISOString(),
+              dueDate: new Date().toISOString(),
             },
           };
         }
@@ -216,13 +222,13 @@ export function InvoiceTable({ initialQuotations }: InvoiceTableProps) {
                   {item.quotation.totalWithTaxes.toFixed(2)} €
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  {item.hasInvoice ? (
+                  {item.hasInvoice && item.invoiceId ? (
                     <InvoiceStatusSelector
-                      invoiceId={item.invoiceId!}
+                      invoiceId={item.invoiceId}
                       currentStatus={item.invoice?.status || "draft"}
                       onStatusChange={handleStatusChange}
                       disabled={
-                        loading.has(item.invoiceId!) ||
+                        loading.has(item.invoiceId) ||
                         loading.has(item.quotation.id)
                       }
                     />
@@ -248,13 +254,15 @@ export function InvoiceTable({ initialQuotations }: InvoiceTableProps) {
                           : "Pending"}
                       </span>
                     )}
-                    <button
-                      onClick={() => handleSendMail(item.invoice?.id as string)}
-                      disabled={isPending}
-                      className="bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700 transition text-sm"
-                    >
-                      {isPending ? "Envoi en cours..." : "Envoyer"}
-                    </button>
+                    {(item.invoiceId || item.invoice?.id) && (
+                      <button
+                        onClick={() => handleSendMail(item.invoiceId || item.invoice?.id as string)}
+                        disabled={isPending}
+                        className="bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700 transition text-sm"
+                      >
+                        {isPending ? "Envoi en cours..." : "Envoyer"}
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>
