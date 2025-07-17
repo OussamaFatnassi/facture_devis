@@ -88,10 +88,6 @@ export class SearchProductsUseCase {
       errors.push('Search query is required');
     }
 
-    if (request.query.trim().length < 2) {
-      errors.push('Search query must be at least 2 characters long');
-    }
-
     if (request.limit && request.limit < 1) {
       errors.push('Limit must be greater than 0');
     }
