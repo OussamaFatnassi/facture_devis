@@ -242,7 +242,7 @@ export function InvoiceTable({ initialQuotations }: InvoiceTableProps) {
                   <div className="flex gap-2">
                     {item.hasInvoice && item.invoiceId ? (
                       <a
-                        href={`/api/invoices/${item.invoiceId}/download`}
+                        href={`/invoice/api/${item.invoiceId}/download`}
                         className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition text-sm"
                       >
                         Télécharger PDF

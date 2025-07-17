@@ -25,15 +25,14 @@ export class MailService {
       invoice === true ? "e" : ""
     }.</p></br>
       <p>Vous pouvez ${invoice === true ? "la" : "le"} consulter ici : 
-         <a href="http://localhost:3000/api/${
-           invoice === true ? "invoices" : "quotations"
-         }/${quotationId}/download">Voir ${invoice === true ? "la" : "le"} ${
-      invoice === true ? "facture" : "devis"
-    }</a></p></br>
+         <a href="http://localhost:3000/${
+           invoice === true ? "invoice" : "quotation"
+         }/api/${quotationId}/download">Voir ${
+      invoice === true ? "la" : "le"
+    } ${invoice === true ? "facture" : "devis"}</a></p></br>
       <p>Cordialement,</p>
       <p>${senderFullname}.</p>
     `;
-    console.log(`${process.env.APP_URL}/quotations/${quotationId}/download`);
     await this.mailer.send({ to, subject, html });
   }
 }

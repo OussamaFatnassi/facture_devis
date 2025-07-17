@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { updateQuotationStatus } from '../actions/quotation-actions';
-import { QuotationStatus } from '../domain/Quotation';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from "react";
+import { updateQuotationStatus } from "../actions/quotation-actions";
+import { QuotationStatus } from "../domain/Quotation";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface QuotationData {
   id: string;
@@ -38,32 +38,38 @@ interface QuotationTableProps {
 }
 
 export function QuotationTable({ initialQuotations }: QuotationTableProps) {
-  const [quotations, setQuotations] = useState<QuotationData[]>(initialQuotations);
+  const [quotations, setQuotations] =
+    useState<QuotationData[]>(initialQuotations);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<Set<string>>(new Set());
   const router = useRouter();
 
-  const handleStatusChange = async (quotationId: string, newStatus: QuotationStatus) => {
+  const handleStatusChange = async (
+    quotationId: string,
+    newStatus: QuotationStatus
+  ) => {
     try {
-      setLoading(prev => new Set(prev).add(quotationId));
+      setLoading((prev) => new Set(prev).add(quotationId));
       const formData = new FormData();
-      formData.append('quotationId', quotationId);
-      formData.append('status', newStatus);
-      
+      formData.append("quotationId", quotationId);
+      formData.append("status", newStatus);
+
       await updateQuotationStatus(formData);
-      
+
       // Update local state
-      setQuotations(prev => prev.map(q => 
-        q.id === quotationId 
-          ? { ...q, status: newStatus }
-          : q
-      ));
-      
+      setQuotations((prev) =>
+        prev.map((q) =>
+          q.id === quotationId ? { ...q, status: newStatus } : q
+        )
+      );
+
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Échec de la mise à jour du statut');
+      setError(
+        err instanceof Error ? err.message : "Échec de la mise à jour du statut"
+      );
     } finally {
-      setLoading(prev => {
+      setLoading((prev) => {
         const newSet = new Set(prev);
         newSet.delete(quotationId);
         return newSet;
@@ -76,7 +82,7 @@ export function QuotationTable({ initialQuotations }: QuotationTableProps) {
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}
-          <button 
+          <button
             onClick={() => setError(null)}
             className="float-right text-red-500 hover:text-red-700"
           >
@@ -84,7 +90,7 @@ export function QuotationTable({ initialQuotations }: QuotationTableProps) {
           </button>
         </div>
       )}
-      
+
       <div className="bg-white shadow rounded-lg overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50">
@@ -129,18 +135,18 @@ export function QuotationTable({ initialQuotations }: QuotationTableProps) {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {new Date(quotation.date).toLocaleDateString('fr-FR', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit'
+                  {new Date(quotation.date).toLocaleDateString("fr-FR", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
                   })}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {quotation.totalWithTaxes.toFixed(2)} €
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <QuotationStatusSelector 
-                    quotationId={quotation.id} 
+                  <QuotationStatusSelector
+                    quotationId={quotation.id}
                     currentStatus={quotation.status}
                     onStatusChange={handleStatusChange}
                     disabled={loading.has(quotation.id)}
@@ -149,7 +155,7 @@ export function QuotationTable({ initialQuotations }: QuotationTableProps) {
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex gap-2">
                     <a
-                      href={`/api/quotations/${quotation.id}/download`}
+                      href={`/quotation/api/${quotation.id}/download`}
                       className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition text-sm"
                     >
                       Télécharger PDF
@@ -171,13 +177,13 @@ export function QuotationTable({ initialQuotations }: QuotationTableProps) {
   );
 }
 
-function QuotationStatusSelector({ 
-  quotationId, 
+function QuotationStatusSelector({
+  quotationId,
   currentStatus,
   onStatusChange,
-  disabled = false
-}: { 
-  quotationId: string; 
+  disabled = false,
+}: {
+  quotationId: string;
   currentStatus: QuotationStatus;
   onStatusChange: (quotationId: string, status: QuotationStatus) => void;
   disabled?: boolean;
@@ -196,21 +202,31 @@ function QuotationStatusSelector({
 
   const getStatusColor = (status: QuotationStatus) => {
     switch (status) {
-      case 'draft': return 'bg-gray-100 text-gray-800';
-      case 'sent': return 'bg-blue-100 text-blue-800';
-      case 'accepted': return 'bg-green-100 text-green-800';
-      case 'rejected': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "draft":
+        return "bg-gray-100 text-gray-800";
+      case "sent":
+        return "bg-blue-100 text-blue-800";
+      case "accepted":
+        return "bg-green-100 text-green-800";
+      case "rejected":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getStatusLabel = (status: QuotationStatus) => {
     switch (status) {
-      case 'draft': return 'Brouillon';
-      case 'sent': return 'Envoyé';
-      case 'accepted': return 'Accepté';
-      case 'rejected': return 'Rejeté';
-      default: return status;
+      case "draft":
+        return "Brouillon";
+      case "sent":
+        return "Envoyé";
+      case "accepted":
+        return "Accepté";
+      case "rejected":
+        return "Rejeté";
+      default:
+        return status;
     }
   };
 
@@ -219,7 +235,9 @@ function QuotationStatusSelector({
       value={status}
       onChange={handleStatusChange}
       disabled={disabled}
-      className={`text-xs font-medium px-2.5 py-0.5 rounded-full border-0 focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed ${getStatusColor(status)}`}
+      className={`text-xs font-medium px-2.5 py-0.5 rounded-full border-0 focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed ${getStatusColor(
+        status
+      )}`}
     >
       <option value="draft">Brouillon</option>
       <option value="sent">Envoyé</option>
@@ -227,4 +245,4 @@ function QuotationStatusSelector({
       <option value="rejected">Rejeté</option>
     </select>
   );
-} 
+}

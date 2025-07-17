@@ -73,7 +73,7 @@ export default async function QuotationDetailPage({ params }: Props) {
       </div>
       <div className="mt-8 flex gap-4">
         <a
-          href={`/api/quotations/${quotation.id}/download`}
+          href={`/quotation/api/${quotation.id}/download`}
           target="_blank"
           className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition text-sm"
         >
