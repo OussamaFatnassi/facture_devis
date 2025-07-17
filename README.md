@@ -5,9 +5,18 @@ Basée sur **Next.js**, **Prisma** et **React** en **DDD**.
 
 ---
 
+## **Membres**:
+
+Oussama FATNASSI, Amine ASFAR, Yaye Adama GUEYE, Yasmine LARBI et Mohamed Mounib OUROUA.
+
+**Remarque: code mis à jour sur main ou Dev**
+
+---
+
 ## Sommaire
 
 - [facture\_devis](#facture_devis)
+  - [**Membres**:](#membres)
   - [Sommaire](#sommaire)
   - [Fonctionnalités](#fonctionnalités)
   - [Prérequis](#prérequis)
@@ -32,9 +41,9 @@ Basée sur **Next.js**, **Prisma** et **React** en **DDD**.
 ## Prérequis
 
 - Node.js (version recommandée : 20+)
-- npm (ou yarn)
+- npm
 - **PostgreSQL** (pour la base de données)
-- Un serveur SMTP (Mailtrap, Ethereal, Gmail… pour l’envoi d’e-mails)
+- Un serveur SMTP (Mailtrap)
 
 ---
 
