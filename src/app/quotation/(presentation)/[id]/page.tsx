@@ -58,7 +58,7 @@ export default async function QuotationDetailPage({ params }: Props) {
           <ul className="list-disc pl-6 mt-2 space-y-1">
             {quotation.lines.map((line, idx) => (
               <li key={idx}>
-                {line.description} — {line.quantity} x {line.unitPrice} € ={" "}
+                {line.productName} — {line.quantity} x {line.unitPrice} € ={" "}
                 {line.totalPrice.toFixed(2)} €
               </li>
             ))}

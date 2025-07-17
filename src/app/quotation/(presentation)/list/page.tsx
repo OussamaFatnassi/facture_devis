@@ -24,7 +24,9 @@ function serializeQuotation(quotation: Quotation) {
       legalStatus: quotation.client.legalStatus,
     },
     lines: quotation.lines.map((line) => ({
-      description: line.description,
+      productId: line.productId,
+      productName: line.productName,
+      productDescription: line.productDescription,
       quantity: line.quantity,
       unitPrice: line.unitPrice,
       totalPrice: line.totalPrice,

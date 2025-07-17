@@ -9,12 +9,14 @@ import {
 import { TextField } from "@radix-ui/themes";
 import Link from "next/link";
 import { ClientInfo } from "../domain/Quotation";
+import { getAllProducts } from "../../product/actions/product-actions";
 
 export default function QuotationPage() {
   const [lines, setLines] = useState([
-    { description: "", quantity: 1, unitPrice: 0 },
+    { productId: "", productName: "", productDescription: "", quantity: 1, unitPrice: 0, totalPrice: 0 },
   ]);
   const [clients, setClients] = useState<ClientInfo[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [showNewClientForm, setShowNewClientForm] = useState(false);
   const [isCreatingClient, setIsCreatingClient] = useState(false);
@@ -22,6 +24,7 @@ export default function QuotationPage() {
   // Load clients on component mount
   useEffect(() => {
     loadClients();
+    loadProducts();
   }, []);
 
   const loadClients = async () => {
@@ -32,6 +35,17 @@ export default function QuotationPage() {
       }
     } catch (error) {
       console.error("Error loading clients:", error);
+    }
+  };
+
+  const loadProducts = async () => {
+    try {
+      const response = await getAllProducts();
+      if (response.success) {
+        setProducts(response.products);
+      }
+    } catch (error) {
+      console.error("Error loading products:", error);
     }
   };
 
@@ -52,7 +66,10 @@ export default function QuotationPage() {
   };
 
   const addLine = () =>
-    setLines([...lines, { description: "", quantity: 1, unitPrice: 0 }]);
+    setLines([
+      ...lines,
+      { productId: "", productName: "", productDescription: "", quantity: 1, unitPrice: 0, totalPrice: 0 },
+    ]);
 
   const removeLine = (index: number) => {
     setLines((prev) => prev.filter((_, i) => i !== index));
@@ -60,26 +77,24 @@ export default function QuotationPage() {
 
   const updateLine = (index: number, field: string, value: unknown) => {
     const newLines = [...lines];
-
-    // Handle numeric fields to prevent NaN
-    if (field === "quantity") {
-      const numValue =
-        typeof value === "string" ? parseInt(value) : (value as number);
-      newLines[index] = {
-        ...newLines[index],
-        [field]: isNaN(numValue) ? 1 : numValue,
-      };
-    } else if (field === "unitPrice") {
-      const numValue =
-        typeof value === "string" ? parseFloat(value) : (value as number);
-      newLines[index] = {
-        ...newLines[index],
-        [field]: isNaN(numValue) ? 0 : numValue,
-      };
-    } else {
-      newLines[index] = { ...newLines[index], [field]: value };
+    if (field === "productId") {
+      const product = products.find((p) => p.id === value);
+      if (product) {
+        newLines[index] = {
+          productId: product.id,
+          productName: product.name,
+          productDescription: product.description,
+          quantity: 1,
+          unitPrice: product.price,
+          totalPrice: product.price * 1,
+        };
+      }
+    } else if (field === "quantity") {
+      const qty = typeof value === "string" ? parseInt(value) : (value as number);
+      const quantity = isNaN(qty) ? 1 : qty;
+      newLines[index].quantity = quantity;
+      newLines[index].totalPrice = newLines[index].unitPrice * quantity;
     }
-
     setLines(newLines);
   };
 
@@ -90,10 +105,7 @@ export default function QuotationPage() {
   };
 
   const calculateTotalHT = () => {
-    return lines.reduce(
-      (sum, line) => sum + calculateLineTotal(line.quantity, line.unitPrice),
-      0
-    );
+    return lines.reduce((sum, line) => sum + line.totalPrice, 0);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -304,7 +316,7 @@ export default function QuotationPage() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Nom d'activité *
+                        Nom d&apos;activité *
                       </label>
                       <TextField.Root
                         name="activityName"
@@ -417,136 +429,116 @@ export default function QuotationPage() {
                     Lignes du devis
                   </h3>
                   <p className="text-sm text-gray-600">
-                    Ajoutez les produits ou services de votre devis
+                    Ajoutez les produits à votre devis
                   </p>
                 </div>
               </div>
-
-              {/* Lines */}
-              <div className="space-y-4">
-                {lines.map((line, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-gray-50 rounded-lg p-4 border border-gray-200"
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-sm font-medium text-gray-700">
-                        Ligne #{idx + 1}
-                      </span>
-                      {lines.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removeLine(idx)}
-                          className="text-red-600 hover:text-red-800 transition-colors"
+              {lines.map((line, idx) => (
+                <div
+                  key={idx}
+                  className="bg-gray-50 rounded-lg p-4 border border-gray-200 mb-2"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-sm font-medium text-gray-700">
+                      Ligne #{idx + 1}
+                    </span>
+                    {lines.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeLine(idx)}
+                        className="text-red-600 hover:text-red-800 transition-colors"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
                         >
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                            />
-                          </svg>
-                        </button>
-                      )}
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Produit
+                      </label>
+                      <select
+                        name="productId"
+                        value={line.productId}
+                        onChange={(e) => updateLine(idx, "productId", e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        required
+                      >
+                        <option value="">Sélectionner un produit</option>
+                        {products.map((product) => (
+                          <option key={product.id} value={product.id}>
+                            {product.name} - {product.price.toFixed(2)} €
+                          </option>
+                        ))}
+                      </select>
                     </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-                      <div className="md:col-span-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Description
-                        </label>
-                        <TextField.Root
-                          name="description"
-                          placeholder="Description du service/produit"
-                          value={line.description}
-                          onChange={(e) =>
-                            updateLine(idx, "description", e.target.value)
-                          }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          required
-                        />
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Description
+                      </label>
+                      <div className="bg-gray-100 px-3 py-2 rounded-lg text-gray-700 min-h-[38px]">
+                        {line.productDescription}
                       </div>
-
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Quantité
-                        </label>
-                        <TextField.Root
-                          name="quantity"
-                          type="number"
-                          placeholder="Qté"
-                          value={line.quantity.toString()}
-                          onChange={(e) =>
-                            updateLine(idx, "quantity", e.target.value)
-                          }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          required
-                        />
-                      </div>
-
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Prix unitaire
-                        </label>
-                        <TextField.Root
-                          name="unitPrice"
-                          type="number"
-                          placeholder="Prix HT"
-                          value={line.unitPrice.toString()}
-                          onChange={(e) =>
-                            updateLine(idx, "unitPrice", e.target.value)
-                          }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          step="0.01"
-                          required
-                        />
-                      </div>
-
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Total
-                        </label>
-                        <div className="flex items-center justify-center h-10 bg-white border border-gray-300 rounded-lg">
-                          <span className="text-sm font-semibold text-gray-900">
-                            {calculateLineTotal(
-                              line.quantity,
-                              line.unitPrice
-                            ).toFixed(2)}{" "}
-                            €
-                          </span>
-                        </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Quantité
+                      </label>
+                      <TextField.Root
+                        name="quantity"
+                        type="number"
+                        min={1}
+                        value={line.quantity}
+                        onChange={(e) => updateLine(idx, "quantity", e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Total
+                      </label>
+                      <div className="flex items-center justify-center h-10 bg-white border border-gray-300 rounded-lg">
+                        <span className="text-sm font-semibold text-gray-900">
+                          {line.totalPrice.toFixed(2)} €
+                        </span>
                       </div>
                     </div>
                   </div>
-                ))}
-
-                <button
-                  type="button"
-                  onClick={addLine}
-                  className="w-full flex items-center justify-center gap-2 py-3 px-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:text-blue-600 hover:border-blue-300 transition-colors"
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={addLine}
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:text-blue-600 hover:border-blue-300 transition-colors"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                    />
-                  </svg>
-                  Ajouter une ligne
-                </button>
-              </div>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+                Ajouter une ligne
+              </button>
             </div>
 
             {/* Total Summary */}

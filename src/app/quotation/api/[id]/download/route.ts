@@ -102,7 +102,7 @@ export async function GET(
       color: rowBg,
     });
 
-    page.drawText(line.description, { x: colX.desc, y, size: 10, font });
+    page.drawText(line.productName, { x: colX.desc, y, size: 10, font });
     page.drawText(String(line.quantity), { x: colX.qty, y, size: 10, font });
     page.drawText(`${line.unitPrice.toFixed(2)} €`, {
       x: colX.pu,
