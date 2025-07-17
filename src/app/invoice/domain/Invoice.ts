@@ -1,11 +1,6 @@
-export type InvoiceStatus = "draft" | "sent" | "paid" | "overdue" | "cancelled";
+import { ProductLine } from '../../product/domain/ProductLine';
 
-export interface InvoiceLineItem {
-  description: string;
-  quantity: number;
-  unitPrice: number;
-  totalPrice: number;
-}
+export type InvoiceStatus = "draft" | "sent" | "paid" | "overdue" | "cancelled";
 
 export interface ClientInfo {
   id: string;
@@ -20,7 +15,7 @@ export interface ClientInfo {
 
 export interface QuotationInfo {
   id: string;
-  lines: InvoiceLineItem[];
+  lines: ProductLine[];
   taxRate: number;
   date: Date;
 }
@@ -43,7 +38,7 @@ export class Invoice {
     public updatedAt?: Date
   ) {}
 
-  get lines(): InvoiceLineItem[] {
+  get lines(): ProductLine[] {
     return this.quotation.lines;
   }
 

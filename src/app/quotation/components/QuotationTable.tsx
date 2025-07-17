@@ -25,7 +25,9 @@ interface QuotationData {
     legalStatus: string;
   };
   lines: Array<{
-    description: string;
+    productId: string;
+    productName: string;
+    productDescription: string;
     quantity: number;
     unitPrice: number;
     totalPrice: number;

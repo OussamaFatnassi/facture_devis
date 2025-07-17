@@ -1,46 +1,147 @@
-import { PrismaClient } from '../generated/prisma/index';
+import { PrismaClient } from '../generated/prisma';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // Créer des clients
+  console.log('🌱 Starting database seed...');
+
+  // Create users
+  const users = await Promise.all([
+    prisma.user.create({
+      data: {
+        email: 'admin@example.com',
+        password: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4tbQjOqKqG', // password: admin123
+        firstName: 'Admin',
+        lastName: 'User',
+        role: 'ADMIN',
+        isActive: true,
+      },
+    }),
+    prisma.user.create({
+      data: {
+        email: 'user@example.com',
+        password: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4tbQjOqKqG', // password: user123
+        firstName: 'Regular',
+        lastName: 'User',
+        role: 'USER',
+        isActive: true,
+      },
+    }),
+  ]);
+
+  console.log('Users created:', users.length);
+
+  // Create products
+  const products = await Promise.all([
+    prisma.product.create({
+      data: {
+        name: 'Développement site web vitrine',
+        description: 'Création d\'un site web vitrine professionnel avec design responsive',
+        price: 2500.00,
+        isActive: true,
+      },
+    }),
+    prisma.product.create({
+      data: {
+        name: 'Application mobile React Native',
+        description: 'Développement d\'une application mobile cross-platform',
+        price: 8000.00,
+        isActive: true,
+      },
+    }),
+    prisma.product.create({
+      data: {
+        name: 'Formation utilisateurs',
+        description: 'Session de formation pour les utilisateurs finaux',
+        price: 300.00,
+        isActive: true,
+      },
+    }),
+    prisma.product.create({
+      data: {
+        name: 'Intégration API',
+        description: 'Intégration d\'APIs tierces dans votre système',
+        price: 1500.00,
+        isActive: true,
+      },
+    }),
+    prisma.product.create({
+      data: {
+        name: 'Audit sécurité',
+        description: 'Audit complet de la sécurité de votre application',
+        price: 1200.00,
+        isActive: true,
+      },
+    }),
+    prisma.product.create({
+      data: {
+        name: 'Maintenance annuelle',
+        description: 'Contrat de maintenance annuelle incluant mises à jour et support',
+        price: 200.00,
+        isActive: true,
+      },
+    }),
+    prisma.product.create({
+      data: {
+        name: 'Refonte complète du système',
+        description: 'Refonte complète de votre système existant',
+        price: 15000.00,
+        isActive: true,
+      },
+    }),
+    prisma.product.create({
+      data: {
+        name: 'Migration des données',
+        description: 'Migration sécurisée de vos données vers le nouveau système',
+        price: 3000.00,
+        isActive: true,
+      },
+    }),
+  ]);
+
+  console.log('Products created:', products.length);
+
+  // Create clients
   const clients = await Promise.all([
     prisma.client.create({
       data: {
         firstname: 'Jean',
         lastname: 'Dupont',
-        activityName: 'Dupont & Associés',
+        activityName: 'Entreprise ABC',
         address: '123 Rue de la Paix, 75001 Paris',
         phone: '01 23 45 67 89',
-        email: 'jean.dupont@dupont-associes.com',
-        legalStatus: 'SARL'
-      }
+        email: 'jean.dupont@abc.com',
+        legalStatus: 'SARL',
+        userId: users[0].id,
+      },
     }),
     prisma.client.create({
       data: {
         firstname: 'Marie',
         lastname: 'Martin',
-        activityName: 'Martin Consulting',
-        address: '456 Avenue des Champs, 69000 Lyon',
-        phone: '04 78 90 12 34',
-        email: 'marie.martin@martin-consulting.fr',
-        legalStatus: 'SAS'
-      }
+        activityName: 'Startup XYZ',
+        address: '456 Avenue des Champs, 75008 Paris',
+        phone: '01 98 76 54 32',
+        email: 'marie.martin@xyz.com',
+        legalStatus: 'SAS',
+        userId: users[0].id,
+      },
     }),
     prisma.client.create({
       data: {
         firstname: 'Pierre',
         lastname: 'Durand',
-        activityName: 'Durand Développement',
-        address: '789 Boulevard Central, 33000 Bordeaux',
-        phone: '05 56 78 90 12',
-        email: 'pierre.durand@durand-dev.fr',
-        legalStatus: 'EURL'
-      }
-    })
+        activityName: 'Cabinet Conseil',
+        address: '789 Boulevard Saint-Germain, 75006 Paris',
+        phone: '01 12 34 56 78',
+        email: 'pierre.durand@conseil.com',
+        legalStatus: 'EI',
+        userId: users[0].id,
+      },
+    }),
   ]);
 
-  console.log('Clients créés:', clients.length);
+  console.log('Clients created:', clients.length);
 
   // Créer des devis
   const quotations = await Promise.all([
@@ -53,18 +154,23 @@ async function main() {
         clientId: clients[0].id,
         quotationLines: [
           {
-            description: 'Développement site web vitrine',
+            productId: products[0].id,
+            productName: products[0].name,
+            productDescription: products[0].description,
             quantity: 1,
-            unitPrice: 2500,
-            totalPrice: 2500
+            unitPrice: products[0].price,
+            totalPrice: products[0].price
           },
           {
-            description: 'Formation utilisateurs',
+            productId: products[2].id,
+            productName: products[2].name,
+            productDescription: products[2].description,
             quantity: 2,
-            unitPrice: 300,
-            totalPrice: 600
+            unitPrice: products[2].price,
+            totalPrice: products[2].price * 2
           }
-        ]
+        ],
+        userId: users[0].id,
       }
     }),
     // Devis accepté pour Marie Martin
@@ -76,18 +182,23 @@ async function main() {
         clientId: clients[1].id,
         quotationLines: [
           {
-            description: 'Application mobile React Native',
+            productId: products[1].id,
+            productName: products[1].name,
+            productDescription: products[1].description,
             quantity: 1,
-            unitPrice: 8000,
-            totalPrice: 8000
+            unitPrice: products[1].price,
+            totalPrice: products[1].price
           },
           {
-            description: 'Intégration API',
+            productId: products[3].id,
+            productName: products[3].name,
+            productDescription: products[3].description,
             quantity: 1,
-            unitPrice: 1500,
-            totalPrice: 1500
+            unitPrice: products[3].price,
+            totalPrice: products[3].price
           }
-        ]
+        ],
+        userId: users[0].id,
       }
     }),
     // Devis draft pour Pierre Durand
@@ -99,12 +210,15 @@ async function main() {
         clientId: clients[2].id,
         quotationLines: [
           {
-            description: 'Audit sécurité',
+            productId: products[4].id,
+            productName: products[4].name,
+            productDescription: products[4].description,
             quantity: 1,
-            unitPrice: 1200,
-            totalPrice: 1200
+            unitPrice: products[4].price,
+            totalPrice: products[4].price
           }
-        ]
+        ],
+        userId: users[0].id,
       }
     }),
     // Devis envoyé pour Jean Dupont
@@ -116,12 +230,15 @@ async function main() {
         clientId: clients[0].id,
         quotationLines: [
           {
-            description: 'Maintenance annuelle',
+            productId: products[5].id,
+            productName: products[5].name,
+            productDescription: products[5].description,
             quantity: 12,
-            unitPrice: 200,
-            totalPrice: 2400
+            unitPrice: products[5].price,
+            totalPrice: products[5].price * 12
           }
-        ]
+        ],
+        userId: users[0].id,
       }
     }),
     // Devis accepté pour Pierre Durand
@@ -133,29 +250,36 @@ async function main() {
         clientId: clients[2].id,
         quotationLines: [
           {
-            description: 'Refonte complète du système',
+            productId: products[6].id,
+            productName: products[6].name,
+            productDescription: products[6].description,
             quantity: 1,
-            unitPrice: 15000,
-            totalPrice: 15000
+            unitPrice: products[6].price,
+            totalPrice: products[6].price
           },
           {
-            description: 'Migration des données',
+            productId: products[7].id,
+            productName: products[7].name,
+            productDescription: products[7].description,
             quantity: 1,
-            unitPrice: 3000,
-            totalPrice: 3000
+            unitPrice: products[7].price,
+            totalPrice: products[7].price
           }
-        ]
+        ],
+        userId: users[0].id,
       }
     })
   ]);
 
   console.log('Devis créés:', quotations.length);
   console.log('Devis acceptés:', quotations.filter(q => q.status === 'accepted').length);
+
+  console.log('✅ Database seed completed successfully!');
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error('❌ Error during seeding:', e);
     process.exit(1);
   })
   .finally(async () => {
