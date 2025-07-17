@@ -4,9 +4,20 @@ import { CreateProductUseCase, CreateProductRequest, CreateProductResponse } fro
 import { SearchProductsUseCase, SearchProductsRequest, SearchProductsResponse } from "../application/use-cases/search-products";
 import { GetAllProductsUseCase, GetAllProductsRequest, GetAllProductsResponse } from "../application/use-cases/get-all-products";
 import { PrismaProductRepository } from "../infrastructure/repositories/product-repository";
+import { getCurrentUser } from "../../user-auth/actions/login-actions";
 
 export async function createProduct(formData: FormData): Promise<CreateProductResponse> {
   try {
+    // Get current user
+    const userResponse = await getCurrentUser();
+    if (!userResponse.success || !userResponse.user) {
+      return {
+        success: false,
+        message: "User not authenticated",
+        errors: ["User not authenticated"]
+      };
+    }
+
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const price = parseFloat(formData.get("price") as string);
@@ -14,7 +25,8 @@ export async function createProduct(formData: FormData): Promise<CreateProductRe
     const request: CreateProductRequest = {
       name,
       description,
-      price
+      price,
+      userId: userResponse.user.id
     };
 
     const productRepository = new PrismaProductRepository();
@@ -32,8 +44,21 @@ export async function createProduct(formData: FormData): Promise<CreateProductRe
 
 export async function searchProducts(query: string, limit?: number, offset?: number): Promise<SearchProductsResponse> {
   try {
+    // Get current user
+    const userResponse = await getCurrentUser();
+    if (!userResponse.success || !userResponse.user) {
+      return {
+        success: false,
+        products: [],
+        total: 0,
+        message: "User not authenticated",
+        errors: ["User not authenticated"]
+      };
+    }
+
     const request: SearchProductsRequest = {
       query,
+      userId: userResponse.user.id,
       limit,
       offset
     };
@@ -55,7 +80,20 @@ export async function searchProducts(query: string, limit?: number, offset?: num
 
 export async function getAllProducts(limit?: number, offset?: number, activeOnly?: boolean): Promise<GetAllProductsResponse> {
   try {
+    // Get current user
+    const userResponse = await getCurrentUser();
+    if (!userResponse.success || !userResponse.user) {
+      return {
+        success: false,
+        products: [],
+        total: 0,
+        message: "User not authenticated",
+        errors: ["User not authenticated"]
+      };
+    }
+
     const request: GetAllProductsRequest = {
+      userId: userResponse.user.id,
       limit,
       offset,
       activeOnly

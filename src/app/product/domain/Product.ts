@@ -4,6 +4,7 @@ export interface ProductProps {
   description: string;
   price: number;
   isActive: boolean;
+  userId: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -14,6 +15,7 @@ export class Product {
   private _description: string;
   private _price: number;
   private _isActive: boolean;
+  private _userId: string;
   private _createdAt: Date;
   private _updatedAt: Date;
 
@@ -23,6 +25,7 @@ export class Product {
     this._description = props.description;
     this._price = props.price;
     this._isActive = props.isActive ?? true;
+    this._userId = props.userId;
     this._createdAt = props.createdAt || new Date();
     this._updatedAt = props.updatedAt || new Date();
   }
@@ -46,6 +49,10 @@ export class Product {
 
   get isActive(): boolean {
     return this._isActive;
+  }
+
+  get userId(): string {
+    return this._userId;
   }
 
   get createdAt(): Date {
