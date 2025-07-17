@@ -193,7 +193,7 @@ export default function NavBar() {
                         </div>
                       </div>
                         <Link
-                          href="/profile"
+                          href="/user-auth/profile"
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                         >
                           <div className="flex items-center space-x-2">
