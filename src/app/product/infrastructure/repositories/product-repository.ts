@@ -1,6 +1,6 @@
-import { PrismaClient } from '../../../../../generated/prisma/index';
-import { Product } from '../../domain/Product';
-import { ProductRepository } from '../../domain/ProductRepository';
+import { PrismaClient } from "../../../../../generated/prisma/index";
+import { Product } from "../../domain/Product";
+import { ProductRepository } from "../../domain/ProductRepository";
 
 export class PrismaProductRepository implements ProductRepository {
   private readonly prisma: PrismaClient;
@@ -17,13 +17,13 @@ export class PrismaProductRepository implements ProductRepository {
       price: product.price,
       isActive: product.isActive,
       userId: product.userId,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     const result = await this.prisma.product.upsert({
       where: { id: product.id },
       create: productData,
-      update: productData
+      update: productData,
     });
 
     return this.mapToDomain(result);
@@ -31,7 +31,7 @@ export class PrismaProductRepository implements ProductRepository {
 
   async findById(id: string): Promise<Product | null> {
     const result = await this.prisma.product.findUnique({
-      where: { id }
+      where: { id },
     });
 
     return result ? this.mapToDomain(result) : null;
@@ -39,42 +39,49 @@ export class PrismaProductRepository implements ProductRepository {
 
   async findByName(name: string, userId: string): Promise<Product | null> {
     const result = await this.prisma.product.findFirst({
-      where: { 
+      where: {
         name: {
           equals: name,
-          mode: 'insensitive'
+          mode: "insensitive",
         },
-        userId
-      }
+        userId,
+      },
     });
 
     return result ? this.mapToDomain(result) : null;
   }
 
-  async findByUser(userId: string, limit?: number, offset?: number): Promise<Product[]> {
+  async findByUser(
+    userId: string,
+    limit?: number,
+    offset?: number
+  ): Promise<Product[]> {
     const results = await this.prisma.product.findMany({
       where: { userId },
       take: limit,
       skip: offset,
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: "desc" },
     });
 
-    return results.map(result => this.mapToDomain(result));
+    return results.map((result) => this.mapToDomain(result));
   }
 
   async findActiveProductsByUser(userId: string): Promise<Product[]> {
     const results = await this.prisma.product.findMany({
-      where: { 
+      where: {
         isActive: true,
-        userId 
+        userId,
       },
-      orderBy: { name: 'asc' }
+      orderBy: { name: "asc" },
     });
 
-    return results.map(result => this.mapToDomain(result));
+    return results.map((result) => this.mapToDomain(result));
   }
 
-  async searchProductsByUser(query: string, userId: string): Promise<Product[]> {
+  async searchProductsByUser(
+    query: string,
+    userId: string
+  ): Promise<Product[]> {
     const results = await this.prisma.product.findMany({
       where: {
         AND: [
@@ -85,52 +92,56 @@ export class PrismaProductRepository implements ProductRepository {
               {
                 name: {
                   contains: query,
-                  mode: 'insensitive'
-                }
+                  mode: "insensitive",
+                },
               },
               {
                 description: {
                   contains: query,
-                  mode: 'insensitive'
-                }
-              }
-            ]
-          }
-        ]
+                  mode: "insensitive",
+                },
+              },
+            ],
+          },
+        ],
       },
-      orderBy: { name: 'asc' }
+      orderBy: { name: "asc" },
     });
 
-    return results.map(result => this.mapToDomain(result));
+    return results.map((result) => this.mapToDomain(result));
   }
 
   async exists(id: string): Promise<boolean> {
     const result = await this.prisma.product.findUnique({
-      where: { id }
+      where: { id },
     });
     return result !== null;
   }
 
   async delete(id: string): Promise<void> {
     await this.prisma.product.delete({
-      where: { id }
+      where: { id },
     });
   }
 
-  async findByPriceRangeByUser(minPrice: number, maxPrice: number, userId: string): Promise<Product[]> {
+  async findByPriceRangeByUser(
+    minPrice: number,
+    maxPrice: number,
+    userId: string
+  ): Promise<Product[]> {
     const results = await this.prisma.product.findMany({
       where: {
         AND: [
           { isActive: true },
           { userId },
           { price: { gte: minPrice } },
-          { price: { lte: maxPrice } }
-        ]
+          { price: { lte: maxPrice } },
+        ],
       },
-      orderBy: { price: 'asc' }
+      orderBy: { price: "asc" },
     });
 
-    return results.map(result => this.mapToDomain(result));
+    return results.map((result) => this.mapToDomain(result));
   }
 
   private mapToDomain(prismaProduct: any): Product {
@@ -142,7 +153,7 @@ export class PrismaProductRepository implements ProductRepository {
       isActive: prismaProduct.isActive,
       userId: prismaProduct.userId,
       createdAt: prismaProduct.createdAt,
-      updatedAt: prismaProduct.updatedAt
+      updatedAt: prismaProduct.updatedAt,
     });
   }
-} 
+}

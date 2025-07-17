@@ -1,6 +1,6 @@
 import { PrismaClient } from "../../../../../generated/prisma";
 import { QuotationRepository } from "../../../quotation/domain/QuotationRepository";
-import { Quotation, QuotationLine } from "../../../quotation/domain/Quotation";
+import { Quotation } from "../../../quotation/domain/Quotation";
 // import { toDomain, toPersistence } from "../mappers/quotation-mapper";
 
 const prisma = new PrismaClient();
@@ -36,7 +36,7 @@ export class PrismaQuotationRepository implements QuotationRepository {
     const lines =
       typeof record.quotationLines === "string"
         ? JSON.parse(record.quotationLines)
-        : (record.quotationLines as unknown as QuotationLine[]);
+        : record.quotationLines;
 
     return new Quotation(
       record.id,
@@ -69,7 +69,7 @@ export class PrismaQuotationRepository implements QuotationRepository {
       const lines =
         typeof record.quotationLines === "string"
           ? JSON.parse(record.quotationLines)
-          : (record.quotationLines as unknown as QuotationLine[]);
+          : record.quotationLines;
 
       return new Quotation(
         record.id,
@@ -104,7 +104,7 @@ export class PrismaQuotationRepository implements QuotationRepository {
       const lines =
         typeof record.quotationLines === "string"
           ? JSON.parse(record.quotationLines)
-          : (record.quotationLines as unknown as QuotationLine[]);
+          : record.quotationLines;
 
       return new Quotation(
         record.id,
@@ -140,9 +140,7 @@ export class PrismaQuotationRepository implements QuotationRepository {
       include: { client: true },
     });
 
-    const lines = JSON.parse(
-      updatedRecord.quotationLines as string
-    ) as QuotationLine[];
+    const lines = JSON.parse(updatedRecord.quotationLines as string);
 
     return new Quotation(
       updatedRecord.id,

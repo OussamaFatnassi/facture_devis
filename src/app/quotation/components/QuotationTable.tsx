@@ -217,21 +217,6 @@ function QuotationStatusSelector({
     }
   };
 
-  const getStatusLabel = (status: QuotationStatus) => {
-    switch (status) {
-      case "draft":
-        return "Brouillon";
-      case "sent":
-        return "Envoyé";
-      case "accepted":
-        return "Accepté";
-      case "rejected":
-        return "Rejeté";
-      default:
-        return status;
-    }
-  };
-
   return (
     <select
       value={status}
