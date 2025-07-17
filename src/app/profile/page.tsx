@@ -17,37 +17,50 @@ export default function ProfilePage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto bg-white shadow-sm rounded-2xl border border-gray-200 p-6">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-6">Mon profil</h1>
+    <main className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto bg-white rounded-3xl shadow-md border border-gray-200 p-8">
+        {/* Title */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Profil utilisateur</h1>
+          <p className="text-gray-500 mt-1">Visualisez les informations associées à votre compte.</p>
+        </div>
 
-        <div className="flex items-center space-x-4 mb-6">
-          <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center">
-            <span className="text-xl font-medium text-white">
-              {(user.fullName || user.email)?.charAt(0).toUpperCase()}
-            </span>
+        {/* User avatar & name */}
+        <div className="flex items-center space-x-5 mb-10">
+          <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-xl font-semibold">
+            {(user.fullName || user.email)?.charAt(0).toUpperCase()}
           </div>
           <div>
-            <p className="text-lg font-semibold text-gray-800">{user.fullName || user.email}</p>
-            <p className="text-sm text-gray-500">{user.role}</p>
+            <p className="text-xl font-medium text-gray-800">{user.fullName || user.email}</p>
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200 capitalize">
+              {user.role}
+            </span>
           </div>
         </div>
 
-        <div className="space-y-4 text-sm text-gray-700">
-          <div className="flex justify-between">
+        {/* User info section */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm text-gray-700">
+          <div className="flex flex-col space-y-1">
             <span className="text-gray-500">Nom complet</span>
             <span className="font-medium">{user.fullName || "—"}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-500">Adresse e-mail</span>
+
+          <div className="flex flex-col space-y-1">
+            <span className="text-gray-500">Email</span>
             <span className="font-medium">{user.email}</span>
           </div>
-          <div className="flex justify-between">
+
+          <div className="flex flex-col space-y-1">
             <span className="text-gray-500">Rôle</span>
             <span className="font-medium capitalize">{user.role}</span>
           </div>
+
+          <div className="flex flex-col space-y-1">
+            <span className="text-gray-500">Statut</span>
+            <span className="text-green-600 font-semibold">Actif</span>
+          </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
