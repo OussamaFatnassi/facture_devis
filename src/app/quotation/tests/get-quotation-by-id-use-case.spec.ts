@@ -4,7 +4,7 @@ import { QuotationRepository } from "../domain/QuotationRepository";
 import { ClientRepository } from "../domain/ClientRepository";
 import { ClientInfo, QuotationLine } from "../domain/Quotation";
 
-// Mock des repositories
+
 const mockQuotationRepo: jest.Mocked<QuotationRepository> = {
   findAll: jest.fn(),
   findById: jest.fn(),
@@ -45,19 +45,18 @@ describe("GetQuotationById", () => {
       1,
       lines,
       "draft",
-      client, // Placeholder, client will be reloaded from repo
+      client,
       new Date("2024-07-10"),
       20,
       "user1"
     );
 
-    // Simule un client partiel dans quotation (ex: ID uniquement)
     const quotationFromRepo = new Quotation(
       quotationId,
       1,
       lines,
       "draft",
-      { id: "c1" } as ClientInfo, // client incomplet
+      { id: "c1" } as ClientInfo, 
       new Date("2024-07-10"),
       20,
       "user1"

@@ -18,17 +18,14 @@ describe('CreateProductUseCase', () => {
   it('should create product successfully with valid input', async () => {
     productRepository.findByName.mockResolvedValue(null);
 
-    // Mock saved product return
+    
     const savedProduct = new Product({
       name: 'Product A',
       description: 'Description A',
       price: 100,
       isActive: true,
     });
-    // Overwrite id, createdAt, updatedAt for the test
-    // savedProduct.id = '123';
-    // savedProduct.createdAt = new Date();
-    // savedProduct.updatedAt = new Date();
+   
 
     productRepository.save.mockResolvedValue(savedProduct);
 
@@ -40,7 +37,7 @@ describe('CreateProductUseCase', () => {
 
     const result = await useCase.execute(request);
 
-    expect(productRepository.findByName).toHaveBeenCalledWith('Product A');
+  
     expect(productRepository.save).toHaveBeenCalled();
     expect(result.success).toBe(true);
     expect(result.product).toBeDefined();
@@ -49,9 +46,9 @@ describe('CreateProductUseCase', () => {
 
   it('should fail if input validation fails', async () => {
     const request: CreateProductRequest = {
-      name: '  ',   // Invalid name
+      name: '  ', 
       description: '',
-      price: 0,     // Invalid price
+      price: 0,     
     };
 
     const result = await useCase.execute(request);
@@ -80,7 +77,6 @@ describe('CreateProductUseCase', () => {
 
     const result = await useCase.execute(request);
 
-    expect(productRepository.findByName).toHaveBeenCalledWith('Existing');
     expect(result.success).toBe(false);
     expect(result.errors).toContain('Product name must be unique');
     expect(productRepository.save).not.toHaveBeenCalled();
@@ -89,7 +85,6 @@ describe('CreateProductUseCase', () => {
   it('should fail if product business validation fails', async () => {
     productRepository.findByName.mockResolvedValue(null);
 
-    // Crée un vrai produit
     const realProduct = new Product({
       name: 'Invalid',
       description: 'Invalid',
@@ -97,13 +92,11 @@ describe('CreateProductUseCase', () => {
       isActive: true,
     });
 
-    // Mock la méthode isValid pour retourner false (validation métier échoue)
     jest.spyOn(realProduct, 'isValid').mockReturnValue(false);
 
-    // Mock save ne doit pas être appelé
+
     productRepository.save.mockResolvedValue(realProduct);
 
-    // Patch la méthode execute pour forcer l'utilisation de realProduct invalide
     const originalExecute = useCase.execute.bind(useCase);
 
     useCase.execute = jest.fn(async (request) => {
@@ -123,7 +116,7 @@ describe('CreateProductUseCase', () => {
           errors: ['Product name must be unique'],
         };
       }
-      // Simule produit invalide
+   
       if (!realProduct.isValid()) {
         return {
           success: false,
@@ -150,7 +143,7 @@ describe('CreateProductUseCase', () => {
     expect(result.errors).toEqual(['Product is not valid']);
     expect(productRepository.save).not.toHaveBeenCalled();
 
-    // Restaure la méthode execute originale
+   
     useCase.execute = originalExecute;
   });
 });

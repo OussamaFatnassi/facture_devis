@@ -2,7 +2,7 @@ import { createQuotationUseCase, CreateQuotationInput } from "../application/use
 import { Quotation } from "../domain/Quotation";
 import { QuotationRepository } from "../domain/QuotationRepository";
 
-// Mock du repository
+
 const mockRepo: jest.Mocked<QuotationRepository> = {
   findAll: jest.fn(),
   save: jest.fn(),
@@ -37,7 +37,6 @@ describe("createQuotationUseCase", () => {
       userId: "user1",
     };
 
-    // Simule une instance réelle de Quotation
     const expectedQuotation = new Quotation(
       input.id,
       input.version,
@@ -52,10 +51,10 @@ describe("createQuotationUseCase", () => {
       input.userId
     );
 
-    // On override `isValid` pour forcer un cas valide
+   
     jest.spyOn(expectedQuotation, "isValid").mockReturnValue(true);
 
-    // On force le constructeur de Quotation à renvoyer notre instance
+    
     (Quotation as jest.Mock).mockImplementation(() => expectedQuotation);
 
     mockRepo.save.mockResolvedValue(expectedQuotation);
