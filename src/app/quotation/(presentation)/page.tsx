@@ -742,7 +742,7 @@ export default function QuotationPage() {
                 </div>
                 <div className="text-right space-y-2">
                   <div className="bg-white rounded-lg p-3 shadow-sm border border-gray-200">
-                    <p className="text-sm text-gray-600 mb-1">Total</p>
+                    <p className="text-sm text-gray-600 mb-1">Total HT</p>
                     <p className="text-lg font-bold text-gray-900">
                       {calculateTotalHT().toFixed(2)} €
                     </p>
