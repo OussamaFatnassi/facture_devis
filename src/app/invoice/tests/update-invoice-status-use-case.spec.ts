@@ -1,7 +1,6 @@
 import { UpdateInvoiceStatusUseCase } from "../application/use-cases/update-invoice-status";
 import { Invoice, InvoiceStatus } from "../domain/Invoice";
 
-// Mock des dépendances
 const mockInvoiceRepository = {
   findById: jest.fn(),
   save: jest.fn(),
@@ -22,7 +21,6 @@ describe("UpdateInvoiceStatusUseCase", () => {
       mockInvoiceService as any
     );
 
-    // Instance factice d'une facture
     invoice = {
       id: "inv1",
       status: "draft",
