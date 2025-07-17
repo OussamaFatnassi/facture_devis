@@ -240,6 +240,14 @@ export function InvoiceTable({ initialQuotations }: InvoiceTableProps) {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex gap-2">
+                    {item.hasInvoice && item.invoiceId && (
+                      <button
+                        onClick={() => router.push(`/invoice/${item.invoiceId}`)}
+                        className="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700 transition text-sm"
+                      >
+                        Détails
+                      </button>
+                    )}
                     {item.hasInvoice && item.invoiceId ? (
                       <a
                         href={`/invoice/api/${item.invoiceId}/download`}
